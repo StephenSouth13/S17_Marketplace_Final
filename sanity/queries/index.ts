@@ -133,10 +133,11 @@ const getSingleBlog = async (slug: string) => {
     });
     return data ?? [];
   } catch (error) {
-    console.log("Error fetching all brands:", error);
+    console.log("Error fetching single blog:", error);
     return [];
   }
 };
+
 const getBlogCategories = async () => {
   try {
     const { data } = await sanityFetch({
@@ -144,7 +145,7 @@ const getBlogCategories = async () => {
     });
     return data ?? [];
   } catch (error) {
-    console.log("Error fetching all brands:", error);
+    console.log("Error fetching blog categories:", error);
     return [];
   }
 };
@@ -157,10 +158,32 @@ const getOthersBlog = async (slug: string, quantity: number) => {
     });
     return data ?? [];
   } catch (error) {
-    console.log("Error fetching all brands:", error);
+    console.log("Error fetching other blogs:", error);
     return [];
   }
 };
+
+// Services helpers
+const getServiceBySlug = async (slug: string) => {
+  try {
+    const { data } = await sanityFetch({ query: SERVICE_BY_SLUG_QUERY, params: { slug } });
+    return data ?? null;
+  } catch (error) {
+    console.error("Error fetching service by slug:", error);
+    return null;
+  }
+};
+
+const getServiceCategories = async () => {
+  try {
+    const { data } = await sanityFetch({ query: SERVICE_CATEGORIES });
+    return data ?? [];
+  } catch (error) {
+    console.error("Error fetching service categories:", error);
+    return [];
+  }
+};
+
 export {
   getCategories,
   getAllBrands,
@@ -174,4 +197,6 @@ export {
   getSingleBlog,
   getBlogCategories,
   getOthersBlog,
+  getServiceBySlug,
+  getServiceCategories,
 };

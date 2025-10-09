@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import React from "react";
-
+import Image from "next/image";
 const Logo = ({
   className,
   spanDesign,
@@ -10,11 +10,14 @@ const Logo = ({
 }) => {
   return (
     <a href={"/"} className="inline-flex">
-      <img
+      <Image
         src="/logo/logo.png"
         alt="S17 MarketPlace Logo"
-        // Đã thay đổi h-8 thành h-16
-        className={cn("h-20 w-auto object-contain", className)}
+        width={160}
+        height={80}
+        className={`h-20 w-auto object-contain ${className ?? ""}`}
+        loading="eager"
+        priority={true}
       />
     </a>
   );

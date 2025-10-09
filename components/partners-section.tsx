@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image";
+
 export function PartnersSection() {
   const partners = [
     { name: "VSM", logo: "/logo_partners/vsm.png" },
@@ -30,10 +32,13 @@ export function PartnersSection() {
               key={index}
               className="group relative flex items-center justify-center p-4 transition-all duration-300 hover:scale-105"
             >
-              <img
+              <Image
                 src={partner.logo || "/placeholder.svg"}
                 alt={partner.name}
+                width={240}
+                height={80}
                 className="max-h-20 max-w-full object-contain opacity-80 group-hover:opacity-100 transition-all duration-300 drop-shadow-md"
+                loading="lazy"
               />
             </div>
           ))}

@@ -6,16 +6,7 @@ import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import { GitCompareArrows, Headset, ShieldCheck, Truck } from "lucide-react";
 
-// Định nghĩa kiểu dữ liệu cho đối tượng Brand để khắc phục lỗi 'implicitly has an any type'
-interface Brand {
-    _id: string;
-    slug: {
-        current: string;
-        _type: string;
-    };
-    image: any; 
-    // Thêm các trường khác nếu cần thiết (ví dụ: name: string)
-}
+import { Brand as SanityBrand } from "@/sanity.types";
 
 // Dữ liệu bổ sung về ưu đãi/dịch vụ (Đã dịch)
 const extraData = [
@@ -59,20 +50,24 @@ const ShopByBrands = async () => {
       </div>
       {/* Danh sách logo thương hiệu */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2.5">
-        {brands?.map((brand: Brand) => (
+            {brands?.map((brand: SanityBrand) => (
           <Link
             key={brand?._id}
             href={{ pathname: "/shop", query: { brand: brand?.slug?.current } }}
             className="bg-white w-34 h-24 flex items-center justify-center rounded-md overflow-hidden hover:shadow-lg shadow-shop_dark_green/20 hoverEffect"
           >
-            {brand?.image && (
+            {brand?.image?.asset?.url ? (
               <Image
-                src={urlFor(brand?.image).url()}
-                alt="brandImage" // Giữ nguyên alt tiếng Anh (có thể dịch là "Ảnh thương hiệu")
+                src={urlFor(brand.image).url()}
+                alt={brand?.title || "Brand logo"}
                 width={250}
-                height={250}
+                height={120}
                 className="w-32 h-20 object-contain"
+                loading="lazy"
+                priority={false}
               />
+            ) : (
+              <div className="w-32 h-20 flex items-center justify-center text-sm text-gray-500">No Image</div>
             )}
           </Link>
         ))}

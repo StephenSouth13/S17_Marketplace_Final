@@ -34,10 +34,13 @@ export function S17_Eco() {
                 key={index}
                 className="flex items-center justify-center p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-neutral-800/60 hover:bg-white dark:hover:bg-neutral-700 transition-all duration-300 shadow-sm hover:shadow-md w-full h-28 md:h-32"
               >
-                <img
+                <Image
                   src={partner.logo}
                   alt={partner.name}
+                  width={200}
+                  height={80}
                   className="max-h-20 max-w-[70%] object-contain filter drop-shadow-lg transition-transform duration-500 hover:scale-105"
+                  loading="lazy"
                 />
               </div>
             ))}

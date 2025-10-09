@@ -4,7 +4,7 @@ import { getServiceBySlug, getServiceCategories, getServices } from "@/sanity/qu
 import { urlFor } from "@/sanity/lib/image";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { PortableText } from "next-sanity";
+import { PortableText } from "@portabletext/react";
 import React from "react";
 import dayjs from "dayjs";
 import Link from "next/link";
