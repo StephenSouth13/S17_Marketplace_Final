@@ -4,7 +4,7 @@ import React from "react";
 
 const SignIn = () => {
   return (
-    <SignInButton mode="modal">
+    <SignInButton mode="redirect">
       <button className="text-sm font-semibold hover:text-darkColor text-lightColor hover:cursor-pointer hoverEffect">
         Login
       </button>

@@ -7,13 +7,17 @@
  * https://github.com/sanity-io/next-sanity
  */
 
-import { NextStudio } from 'next-sanity/studio'
-import config from '../../../sanity.config'
-
 export const dynamic = 'force-static'
 
-export { metadata, viewport } from 'next-sanity/studio'
-
 export default function StudioPage() {
-  return <NextStudio config={config} />
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold">Sanity Studio unavailable in this environment</h1>
+      <p className="mt-4">The in-app Sanity Studio is disabled due to package compatibility issues. To access and customize content, run the Sanity Studio locally using the Sanity CLI or connect your external Studio.</p>
+      <ul className="mt-4 list-disc ml-6">
+        <li>Run: <code>npx sanity start</code> in the sanity/ folder</li>
+        <li>Or open the hosted Studio you manage</li>
+      </ul>
+    </div>
+  )
 }
