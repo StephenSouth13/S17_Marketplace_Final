@@ -40,7 +40,6 @@
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
-    "sanity": "^2.36.6",
     "stripe": "^19.1.0",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.0.2",
@@ -55,6 +54,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.1",
+    "sanity": "^4.10.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
