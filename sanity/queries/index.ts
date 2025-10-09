@@ -187,9 +187,13 @@ export {
   getBlogCategories,
   getOthersBlog,
 <<<<<<< HEAD
+<<<<<<< HEAD
   getServiceBySlug,
   getServiceCategories,
 };
+=======
+};
+>>>>>>> parent of 29df75f (Merge pull request #1 from StephenSouth13/ai_main_d83e01c1378b)
 =======
 };
 >>>>>>> parent of 29df75f (Merge pull request #1 from StephenSouth13/ai_main_d83e01c1378b)
