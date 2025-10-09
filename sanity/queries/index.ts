@@ -62,16 +62,6 @@ const getDealProducts = async () => {
     return [];
   }
 };
-
-const getServices = async () => {
-  try {
-    const { data } = await sanityFetch({ query: SERVICES_QUERY });
-    return data ?? [];
-  } catch (error) {
-    console.log("Error fetching services:", error);
-    return [];
-  }
-};
 const getProductBySlug = async (slug: string) => {
   try {
     const product = await sanityFetch({
@@ -189,7 +179,6 @@ export {
   getAllBrands,
   getLatestBlogs,
   getDealProducts,
-  getServices,
   getProductBySlug,
   getBrand,
   getMyOrders,
@@ -197,6 +186,10 @@ export {
   getSingleBlog,
   getBlogCategories,
   getOthersBlog,
+<<<<<<< HEAD
   getServiceBySlug,
   getServiceCategories,
 };
+=======
+};
+>>>>>>> parent of 29df75f (Merge pull request #1 from StephenSouth13/ai_main_d83e01c1378b)
