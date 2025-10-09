@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image";
+
 export function PartnersSection() {
   const partners = [
     { name: "VSM", logo: "/logo_partners/vsm.png" },
