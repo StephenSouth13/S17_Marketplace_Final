@@ -1,49 +1,37 @@
-import { defineQuery } from "next-sanity";
+const BRANDS_QUERY = `*[_type=='brand'] | order(name asc) `;
 
-const BRANDS_QUERY = defineQuery(`*[_type=='brand'] | order(name asc) `);
-
-const LATEST_BLOG_QUERY = defineQuery(
-  ` *[_type == 'blog' && isLatest == true]|order(name asc){
+const LATEST_BLOG_QUERY = ` *[_type == 'blog' && isLatest == true]|order(name asc){
       ...,
       blogcategories[]->{
       title
     }
-    }`
-);
+    }`;
 
-const DEAL_PRODUCTS = defineQuery(
-  `*[_type == 'product' && status == 'hot'] | order(name asc){
+const DEAL_PRODUCTS = `*[_type == 'product' && status == 'hot'] | order(name asc){
     ...,"categories": categories[]->title
-  }`
-);
+  }`;
 
-const PRODUCT_BY_SLUG_QUERY = defineQuery(
-  `*[_type == "product" && slug.current == $slug] | order(name asc) [0]`
-);
+const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug] | order(name asc) [0]`;
 
-const BRAND_QUERY = defineQuery(`*[_type == "product" && slug.current == $slug]{
+const BRAND_QUERY = `*[_type == "product" && slug.current == $slug]{
   "brandName": brand->title
-  }`);
+  }`;
 
-const MY_ORDERS_QUERY =
-  defineQuery(`*[_type == 'order' && clerkUserId == $userId] | order(orderData desc){
+const MY_ORDERS_QUERY = `*[_type == 'order' && clerkUserId == $userId] | order(orderData desc){
 ...,products[]{
   ...,product->
 }
-}`);
-const GET_ALL_BLOG = defineQuery(
-  `*[_type == 'blog'] | order(publishedAt desc)[0...$quantity]{
-  ...,  
+}`;
+const GET_ALL_BLOG = `*[_type == 'blog'] | order(publishedAt desc)[0...$quantity]{
+  ...,
      blogcategories[]->{
     title
 }
     }
-  `
-);
+  `;
 
-const SINGLE_BLOG_QUERY =
-  defineQuery(`*[_type == "blog" && slug.current == $slug][0]{
-  ..., 
+const SINGLE_BLOG_QUERY = `*[_type == "blog" && slug.current == $slug][0]{
+  ...,
     author->{
     name,
     image,
@@ -52,17 +40,15 @@ const SINGLE_BLOG_QUERY =
     title,
     "slug": slug.current,
   },
-}`);
+}`;
 
-const BLOG_CATEGORIES = defineQuery(
-  `*[_type == "blog"]{
+const BLOG_CATEGORIES = `*[_type == "blog"]{
      blogcategories[]->{
     ...
     }
-  }`
-);
+  }`;
 
-const OTHERS_BLOG_QUERY = defineQuery(`*[
+const OTHERS_BLOG_QUERY = `*[
   _type == "blog"
   && defined(slug.current)
   && slug.current != $slug
@@ -80,9 +66,9 @@ const OTHERS_BLOG_QUERY = defineQuery(`*[
     title,
     "slug": slug.current,
   }
-}`);
+}`;
 // Services queries
-const SERVICES_QUERY = defineQuery(`*[_type == "service"] | order(publishedAt desc){
+const SERVICES_QUERY = `*[_type == "service"] | order(publishedAt desc){
   _id,
   title,
   "slug": slug.current,
@@ -93,13 +79,13 @@ const SERVICES_QUERY = defineQuery(`*[_type == "service"] | order(publishedAt de
   priceRange,
   isFeatured,
   publishedAt
-}`);
+}`;
 
-const SERVICE_BY_SLUG_QUERY = defineQuery(`*[_type == "service" && slug.current == $slug][0]{
+const SERVICE_BY_SLUG_QUERY = `*[_type == "service" && slug.current == $slug][0]{
   ..., "category": category->{title, "slug": slug.current}
-}`);
+}`;
 
-const SERVICE_CATEGORIES = defineQuery(`*[_type == "serviceCategory"] | order(title asc){..., "slug": slug.current}`);
+const SERVICE_CATEGORIES = `*[_type == "serviceCategory"] | order(title asc){..., "slug": slug.current}`;
 
 export {
   BRANDS_QUERY,
