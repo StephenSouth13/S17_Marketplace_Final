@@ -6,16 +6,7 @@ import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import { GitCompareArrows, Headset, ShieldCheck, Truck } from "lucide-react";
 
-// Định nghĩa kiểu dữ liệu cho đối tượng Brand để khắc phục lỗi 'implicitly has an any type'
-interface Brand {
-    _id: string;
-    slug: {
-        current: string;
-        _type: string;
-    };
-    image: any; 
-    // Thêm các trường khác nếu cần thiết (ví dụ: name: string)
-}
+import { Brand as SanityBrand } from "@/sanity.types";
 
 // Dữ liệu bổ sung về ưu đãi/dịch vụ (Đã dịch)
 const extraData = [
