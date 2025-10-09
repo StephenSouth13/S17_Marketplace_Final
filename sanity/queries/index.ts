@@ -166,6 +166,7 @@ export {
   getAllBrands,
   getLatestBlogs,
   getDealProducts,
+  getServices,
   getProductBySlug,
   getBrand,
   getMyOrders,
