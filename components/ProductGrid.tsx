@@ -18,7 +18,9 @@ const ProductGrid = () => {
   const query = `*[_type == "product" && variant == $variant] | order(name asc){
   ...,"categories": categories[]->title
 }`;
-  const params = { variant: selectedTab.toLowerCase() };
+  // Map the selected tab title to its backend variant value (e.g. "Thực phẩm" -> "food")
+  const variantValue = productType.find((p) => p.title === selectedTab)?.value || selectedTab.toLowerCase();
+  const params = { variant: variantValue };
 
   useEffect(() => {
     const fetchData = async () => {
