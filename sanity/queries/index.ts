@@ -10,6 +10,9 @@ import {
   OTHERS_BLOG_QUERY,
   PRODUCT_BY_SLUG_QUERY,
   SINGLE_BLOG_QUERY,
+  SERVICES_QUERY,
+  SERVICE_BY_SLUG_QUERY,
+  SERVICE_CATEGORIES,
 } from "./query";
 
 const getCategories = async (quantity?: number) => {
@@ -186,14 +189,6 @@ export {
   getSingleBlog,
   getBlogCategories,
   getOthersBlog,
-<<<<<<< HEAD
-<<<<<<< HEAD
   getServiceBySlug,
   getServiceCategories,
 };
-=======
-};
->>>>>>> parent of 29df75f (Merge pull request #1 from StephenSouth13/ai_main_d83e01c1378b)
-=======
-};
->>>>>>> parent of 29df75f (Merge pull request #1 from StephenSouth13/ai_main_d83e01c1378b)
