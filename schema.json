@@ -1724,15 +1724,15 @@
           "of": [
             {
               "type": "string",
-              "value": "gadget"
+              "value": "Đồ ăn chay"
             },
             {
               "type": "string",
-              "value": "appliances"
+              "value": "Nước uống trái cây"
             },
             {
               "type": "string",
-              "value": "refrigerators"
+              "value": "Dịch vụ "
             },
             {
               "type": "string",
