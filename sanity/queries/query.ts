@@ -1,4 +1,5 @@
-import { defineQuery } from "next-sanity";
+// Use raw GROQ query strings. The `defineQuery` helper is not available
+// in the installed `next-sanity` package version so export plain strings.
 
 const BRANDS_QUERY = defineQuery(`*[_type=='brand'] | order(name asc) `);
 
