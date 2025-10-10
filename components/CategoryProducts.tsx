@@ -1,13 +1,14 @@
 "use client";
 import { Category, Product } from "@/sanity.types";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react"; // Đã thêm useCallback
 import { Button } from "./ui/button";
 import { client } from "@/sanity/lib/client";
 import { AnimatePresence, motion } from "motion/react";
 import { Loader2 } from "lucide-react";
 import NoProductAvailable from "./NoProductAvailable";
 import ProductCard from "./ProductCard";
+
 interface Props {
   categories: Category[];
   slug: string;
@@ -18,13 +19,14 @@ const CategoryProducts = ({ categories, slug }: Props) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
   const handleCategoryChange = (newSlug: string) => {
     if (newSlug === currentSlug) return; // Prevent unnecessary updates
     setCurrentSlug(newSlug);
     router.push(`/category/${newSlug}`, { scroll: false }); // Update URL without
   };
 
-  const fetchProducts = async (categorySlug: string) => {
+  const fetchProducts = useCallback(async (categorySlug: string) => { // Dùng useCallback
     setLoading(true);
     try {
       const query = `
@@ -34,15 +36,24 @@ const CategoryProducts = ({ categories, slug }: Props) => {
       const data = await client.fetch(query, { categorySlug });
       setProducts(data);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      // CẢI THIỆN XỬ LÝ LỖI
+      console.error("Error fetching products by category:", error);
+      if (error instanceof Error) {
+          console.error("Chi tiết lỗi:", error.message, error.stack);
+      } else if (error && typeof error === 'object') {
+          console.error("Đối tượng lỗi đầy đủ:", JSON.stringify(error, Object.getOwnPropertyNames(error))); 
+      } else {
+          console.error("Lỗi không phải đối tượng:", String(error));
+      }
       setProducts([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [setProducts, setLoading, client]); // Thêm dependencies
+
   useEffect(() => {
     fetchProducts(currentSlug);
-  }, [currentSlug]);
+  }, [currentSlug, fetchProducts]); // Thêm fetchProducts vào dependency array
 
   return (
     <div className="py-5 flex flex-col md:flex-row items-start gap-5">
@@ -51,7 +62,7 @@ const CategoryProducts = ({ categories, slug }: Props) => {
           <Button
             onClick={() => handleCategoryChange(item?.slug?.current as string)}
             key={item?._id}
-            className={`bg-transparent border-0 p-0  rounded-none text-darkColor shadow-none hover:bg-shop_orange hover:text-white font-semibold hoverEffect border-b last:border-b-0 transition-colors capitalize ${item?.slug?.current === currentSlug && "bg-shop_orange text-white border-shop_orange"}`}
+            className={`bg-transparent border-0 p-0  rounded-none text-darkColor shadow-none hover:bg-shop_orange hover:text-white font-semibold hoverEffect border-b last:border-b-0 transition-colors capitalize ${item?.slug?.current === currentSlug && "bg-shop_orange text-white border-shop_orange"}`}
           >
             <p className="w-full text-left px-2">{item?.title}</p>
           </Button>

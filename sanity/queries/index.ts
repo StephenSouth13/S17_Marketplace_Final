@@ -56,6 +56,7 @@ const getLatestBlogs = async () => {
     return [];
   }
 };
+
 const getDealProducts = async () => {
   try {
     const { data } = await sanityFetch({ query: DEAL_PRODUCTS });
@@ -65,46 +66,63 @@ const getDealProducts = async () => {
     return [];
   }
 };
+
 const getProductBySlug = async (slug: string) => {
-  try {
-    const product = await sanityFetch({
-      query: PRODUCT_BY_SLUG_QUERY,
-      params: {
-        slug,
-      },
-    });
-    return product?.data || null;
-  } catch (error) {
-    console.error("Error fetching product by ID:", error);
-    return null;
-  }
+  try {
+    const product = await sanityFetch({
+      query: PRODUCT_BY_SLUG_QUERY,
+      params: {
+        slug,
+      },
+    });
+    return product?.data || null;
+  } catch (error) {
+    // Sửa tại đây: In chi tiết lỗi hơn
+    console.error("Error fetching product by slug:", error);
+    if (error instanceof Error) {
+        console.error("Error message:", error.message);
+    } else {
+        // Dùng JSON.stringify để hiển thị nội dung nếu không phải là Error object tiêu chuẩn
+        console.error("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    }
+    return null;
+  }
 };
 const getBrand = async (slug: string) => {
-  try {
-    const product = await sanityFetch({
-      query: BRAND_QUERY,
-      params: {
-        slug,
-      },
-    });
-    return product?.data || null;
-  } catch (error) {
-    console.error("Error fetching product by ID:", error);
-    return null;
-  }
+  try {
+    const product = await sanityFetch({
+      query: BRAND_QUERY,
+      params: {
+        slug,
+      },
+    });
+    return product?.data || null;
+  } catch (error) {
+    // Sửa tại đây: In chi tiết lỗi hơn
+    console.error("Error fetching brand by slug:", error); // Đổi ID thành slug cho rõ ràng
+    if (error instanceof Error) {
+        console.error("Error message:", error.message);
+    } else {
+        console.error("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    }
+    return null;
+  }
 };
 const getMyOrders = async (userId: string) => {
-  try {
-    const orders = await sanityFetch({
-      query: MY_ORDERS_QUERY,
-      params: { userId },
-    });
-    return orders?.data || null;
-  } catch (error) {
-    console.error("Error fetching product by ID:", error);
-    return null;
-  }
+  try {
+    // ...
+  } catch (error) {
+    // Sửa tại đây
+    console.error("Error fetching user orders:", error); 
+    if (error instanceof Error) {
+        console.error("Error message:", error.message);
+    } else {
+        console.error("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    }
+    return null;
+  }
 };
+
 const getAllBlogs = async (quantity: number) => {
   try {
     const { data } = await sanityFetch({
@@ -157,6 +175,17 @@ const getOthersBlog = async (slug: string, quantity: number) => {
 };
 
 // Services helpers
+// HÀM getServices BỊ THIẾU ĐÃ ĐƯỢC THÊM VÀO ĐÂY
+const getServices = async () => {
+  try {
+    const { data } = await sanityFetch({ query: SERVICES_QUERY });
+    return data ?? [];
+  } catch (error) {
+    console.error("Error fetching all services:", error);
+    return [];
+  }
+};
+
 const getServiceBySlug = async (slug: string) => {
   try {
     const { data } = await sanityFetch({ query: SERVICE_BY_SLUG_QUERY, params: { slug } });
@@ -189,6 +218,8 @@ export {
   getSingleBlog,
   getBlogCategories,
   getOthersBlog,
+  // Đã thêm export hàm getServices
+  getServices, 
   getServiceBySlug,
   getServiceCategories,
 };
