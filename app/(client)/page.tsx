@@ -7,7 +7,7 @@ import ShopByBrands from "@/components/ShopByBrands";
 import { getCategories } from "@/sanity/queries";
 import { S17_Eco } from '@/components/s17_eco';
 import { PartnersSection } from "@/components/partners-section";
-
+import { OurServices } from "@/components/our-services";
 
 import React from "react";
 
@@ -19,6 +19,7 @@ const Home = async () => {
       <HomeBanner />
       <ProductGrid />
       <HomeCategories categories={categories} />
+      <OurServices />
       <ShopByBrands />
       <LatestBlog />
       <S17_Eco />.
