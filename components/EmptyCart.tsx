@@ -3,7 +3,7 @@
 import { ShoppingCart } from "lucide-react"; // Biểu tượng giỏ hàng, giờ đỡ buồn hơn rồi.
 import Link from "next/link";
 import { motion } from "framer-motion"; // Khí chất "nhây" nằm ở đây!
-import { emptyCart, emptyCart1 } from "@/images";
+import { emptyCart1 } from "@/images";
 import Image from "next/image";
 
 // Component tối giản - Tập trung vào hiệu ứng và hành động!
