@@ -1,6 +1,6 @@
 "use client";
 import { BRANDS_QUERYResult, Category, Product } from "@/sanity.types";
-import React, { useEffect, useState, useCallback } from "react"; // Đã thêm useCallback
+import React, { useEffect, useState, useCallback } from "react";
 import Container from "./Container";
 import Title from "./Title";
 import CategoryList from "./shop/CategoryList";
@@ -37,7 +37,8 @@ const Shop = ({ categories, brands }: Props) => {
     setLoading(true);
     try {
       let minPrice = 0;
-      let maxPrice = 10000;
+      // 🚨 Thay thế giá trị maxPrice mặc định bằng giá trị lớn hơn nhiều
+      let maxPrice = 1000000000; // 1 tỷ VND (giả định maxPrice)
       if (selectedPrice) {
         const [min, max] = selectedPrice.split("-").map(Number);
         minPrice = min;
@@ -75,7 +76,7 @@ const Shop = ({ categories, brands }: Props) => {
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, selectedBrand, selectedPrice, setProducts, setLoading]); // Dependencies
+  }, [selectedCategory, selectedBrand, selectedPrice]); // Dependencies
 
   useEffect(() => {
     fetchProducts();
@@ -139,6 +140,7 @@ const Shop = ({ categories, brands }: Props) => {
                 ))}
               </div>
             ) : (
+              // Component NoProductAvailable đã được dịch ở yêu cầu trước
               <NoProductAvailable className="bg-white mt-10 rounded-xl shadow-sm" />
             )}
           </main>

@@ -1,22 +1,17 @@
-// app/studio/[[...tool]]/page.tsx
+"use client";
 
-export const metadata = {
-  title: "Studio",
-  description: "Sanity Studio for managing content",
-  robots: { index: false, follow: false },
-};
+import dynamic from "next/dynamic";
 
-export const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-};
+// ✅ Dynamic import NextStudio chỉ trên client
+const StudioClient = dynamic(() => import("./StudioClient"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center min-h-screen text-gray-500">
+      Đang tải Sanity Studio...
+    </div>
+  ),
+});
 
-export const dynamic = "force-static";
-
-import StudioWrapper from "./StudioWrapper";
-
-export default function StudioPage() {
-  return <StudioWrapper />;
+export default function StudioWrapper() {
+  return <StudioClient />;
 }

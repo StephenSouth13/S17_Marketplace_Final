@@ -1,12 +1,10 @@
-// data/navigation.ts
-
+//constants/data.ts
 export const headerData = [
   { title: "Trang chủ", href: "/" },
   { title: "Sản phẩm", href: "/shop" },
   { title: "Dịch vụ", href: "/services" },
   { title: "Ưu đãi Hot", href: "/deal" },
   { title: "Bài viết", href: "/blog" },
-
   // { title: "Liên hệ", href: "/contact" },
 ];
 

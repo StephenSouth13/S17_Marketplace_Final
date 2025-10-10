@@ -2,7 +2,8 @@
 
 import dynamic from "next/dynamic";
 
-const StudioClient = dynamic(() => import("./StudioWrapper"), {
+// ✅ Dynamic import bên trong Client Component => được phép dùng ssr: false
+const StudioClient = dynamic(() => import("./StudioClient"), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center min-h-screen text-gray-500">

@@ -1,72 +1,67 @@
-"use client";
-import { ShoppingCart } from "lucide-react";
+// "use client" - Vẫn phải gọi hồn client để còn "quẩy" hiệu ứng!
+
+import { ShoppingCart } from "lucide-react"; // Biểu tượng giỏ hàng, giờ đỡ buồn hơn rồi.
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { emptyCart } from "@/images";
+import { motion } from "framer-motion"; // Khí chất "nhây" nằm ở đây!
+import { emptyCart, emptyCart1 } from "@/images";
 import Image from "next/image";
 
+// Component tối giản - Tập trung vào hiệu ứng và hành động!
 export default function EmptyCart() {
   return (
-    <div className="py-10 md:py-20 bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
+    // Nền nhẹ nhàng, tránh làm giỏ hàng bị kích động mạnh
+    <div className="flex items-center justify-center p-4 py-20 bg-gray-50">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full space-y-8"
+        // Hiệu ứng "Giỏ hàng hít thở": phập phồng nhẹ nhàng, đợi đồ
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 100, delay: 0.1 }}
+        className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center space-y-6"
       >
         <motion.div
+          // HIỆU ỨNG THẦN THÁNH: GIỎ HÀNG NHÚN NHẢY KHÍCH LỆ
           animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 5, -5, 0],
+            y: [0, -5, 0], // Nhún lên, nhún xuống, kiểu "mua đồ đi, mua đi mà!"
           }}
           transition={{
             repeat: Infinity,
-            duration: 5,
+            duration: 2,
             ease: "easeInOut",
           }}
-          className="relative w-48 h-48 mx-auto"
+          className="relative w-32 h-32 mx-auto"
         >
           <Image
-            src={emptyCart}
-            alt="Empty shopping cart"
+            src={emptyCart1}
+            alt="Giỏ hàng trống"
             layout="fill"
             objectFit="contain"
-            className="drop-shadow-lg"
           />
           <motion.div
-            animate={{
-              x: [0, -10, 10, 0],
-              y: [0, -5, 5, 0],
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 3,
-              ease: "linear",
-            }}
-            className="absolute -top-4 -right-4 bg-blue-500 rounded-full p-2"
+            // Icon giỏ hàng "RUNG ĐỘNG" dữ dội, muốn nhảy ra ngoài
+            animate={{ rotate: [-5, 5, -5] }}
+            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+            className="absolute top-0 right-0 p-1.5 rounded-full bg-red-500 shadow-lg"
           >
-            <ShoppingCart size={24} className="text-white" />
+            <ShoppingCart size={20} className="text-white" />
           </motion.div>
         </motion.div>
 
-        <div className="text-center space-y-4">
-          <h2 className="text-3xl font-bold text-gray-800">
-            Your cart is feeling lonely
-          </h2>
-          <p className="text-gray-600">
-            It looks like you haven&apos;t added anything to your cart yet.
-            Let&apos;s change that and find some amazing products for you!
-          </p>
-        </div>
+        {/* TIÊU ĐỀ HÀI HƯỚC VÀ NGẮN GỌN */}
+        <h2 className="text-2xl font-extrabold text-gray-800">
+          Oops! Giỏ hàng đang... **nhịn đói**!
+        </h2>
+        <p className="text-gray-500 text-sm">
+          **Nó đang chờ bạn đó!** Nhấn nút dưới đây và "chữa lành" cho cái giỏ tội nghiệp này ngay thôi!
+        </p>
 
-        <div>
-          <Link
-            href="/"
-            className="block bg-darkColor/5 border border-darkColor/20 text-center py-2.5 rounded-full text-sm font-semibold tracking-wide hover:border-darkColor hover:bg-darkColor hover:text-white hoverEffect"
-          >
-            Discover Products
-          </Link>
-        </div>
+        {/* NÚT KÊU GỌI HÀNH ĐỘNG CỰC MẠNH */}
+        <Link
+          href="/"
+          className="block w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105"
+        >
+          {/* Lời kêu gọi không thể chối từ */}
+          **CHO GIỎ HÀNG ĂN ĐI NÀO!**
+        </Link>
       </motion.div>
     </div>
   );

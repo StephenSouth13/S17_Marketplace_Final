@@ -1,3 +1,4 @@
+//sanity/schemaTypes/productType.ts
 import { TrolleyIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
@@ -79,16 +80,19 @@ export const productType = defineType({
     }),
     defineField({
       name: "variant",
-      title: "Product Type",
+      title: "Product Type (Phân Loại Chính)", // Đổi tên dễ hiểu hơn
       type: "string",
       options: {
         list: [
-          { title: "Đồ ăn chay", value: "Đồ ăn chay" },
-          { title: "Nước uống trái cây", value: "Nước uống trái cây" },
-          { title: "Dịch vụ ", value: "Dịch vụ " },
-          { title: "Others", value: "others" },
+          // 🚨 Dùng giá trị tiếng Anh không dấu cho backend
+          { title: "Thực phẩm", value: "food" },
+          { title: "Đồ uống", value: "drink" },
+          { title: "Dịch vụ", value: "service" },
+          { title: "Khác", value: "others" },
         ],
+        layout: "radio", // Thường dùng radio cho lựa chọn duy nhất
       },
+      validation: (Rule) => Rule.required(), // Nên yêu cầu trường này
     }),
     defineField({
       name: "isFeatured",

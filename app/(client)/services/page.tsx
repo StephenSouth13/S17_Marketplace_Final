@@ -9,16 +9,25 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Star } from "lucide-react";
 
-// Fallback mock data
-const MOCK_SERVICES = [
-  { id: "svc-001", slug: "thiet-ke-thuong-hieu", name: "Thiết kế thương hiệu trọn gói", description: "Từ logo, guideline đến bộ nhận diện ��ng dụng.", category: "Thiết kế thương hiệu", price: 1290000, rating: 5, image: "/s17co/1.png" },
-  { id: "svc-002", slug: "tu-van-truyen-thong", name: "Tư vấn chiến lược truyền thông", description: "Xây chiến lược truyền thông tổng thể.", category: "Truyền thông", price: 2990000, rating: 4, image: "/s17co/2.png" },
-  { id: "svc-003", slug: "quan-ly-kenh-social", name: "Quản lý kênh Social Media", description: "Lên lịch nội dung, thiết kế hình ảnh.", category: "Truyền thông", price: 1590000, rating: 4, image: "/s17co/3.png" },
-  { id: "svc-004", slug: "san-xuat-noi-dung", name: "Sản xuất nội dung chuẩn thương hiệu", description: "Copywriting, visual và video ngắn.", category: "Nội dung", price: 890000, rating: 5, image: "/s17co/4.png" },
-  { id: "svc-005", slug: "dao-tao-marketing", name: "Đào tạo Marketing nội bộ", description: "Workshop thực hành cho đội ngũ.", category: "Đào tạo", price: 1990000, rating: 5, image: "/s17co/5.png" },
-  { id: "svc-006", slug: "thiet-ke-website", name: "Thiết kế Website chuẩn SEO", description: "Giao diện sạch, tốc độ tối ưu.", category: "Thiết kế thương hiệu", price: 4990000, rating: 4, image: "/s17co/6.png" },
-];
+// Định nghĩa kiểu dữ liệu cho Service (cần thiết sau khi loại bỏ mockup)
+interface Service {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  rating: number;
+  image: string | null;
+  // Thêm các trường dữ liệu thô nếu cần thiết, dựa trên logic lọc
+  raw?: {
+    category?: {
+      title?: string;
+    };
+  };
+}
 
+// Giữ lại hàm formatVND
 const formatVND = (amount: number) =>
   Number(amount ?? 0).toLocaleString("vi-VN", {
     style: "currency",
@@ -27,11 +36,12 @@ const formatVND = (amount: number) =>
     maximumFractionDigits: 0,
   });
 
+// Giữ lại component ServiceCard
 function ServiceCard({ name, description, price, rating, image }: { name: string; description: string; price: number; rating: number; image: string | null; }) {
   return (
     <div className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden">
       <div className="relative bg-gray-50">
-        <Image src={image || "/s17co/1.png"} alt={name} width={600} height={400} className="w-full h-48 object-cover" />
+        <Image src={image || "/s17co/placeholder.png"} alt={name} width={600} height={400} className="w-full h-48 object-cover" />
       </div>
       <div className="p-4 flex flex-col gap-2">
         <Title className="text-base font-semibold leading-snug group-hover:text-shop_dark_green">{name}</Title>
@@ -55,7 +65,9 @@ function ServiceCard({ name, description, price, rating, image }: { name: string
   );
 }
 
+// Giữ lại component ServiceCategories
 function ServiceCategories({ categories, selected, onChange }: { categories: string[]; selected: string | null; onChange: (val: string | null) => void; }) {
+  // ... (Không thay đổi)
   return (
     <div className="w-full bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
       <Title className="text-base font-black">Danh mục dịch vụ</Title>
@@ -81,7 +93,9 @@ const PRICE_RANGES = [
   { label: "Trên 5.000.000 ₫", value: "5000000-100000000" },
 ];
 
+// Giữ lại component PriceFilter
 function PriceFilter({ selected, onChange }: { selected: string | null; onChange: (val: string | null) => void; }) {
+  // ... (Không thay đổi)
   return (
     <div className="w-full bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
       <Title className="text-base font-black">Khoảng giá</Title>
@@ -100,7 +114,9 @@ function PriceFilter({ selected, onChange }: { selected: string | null; onChange
   );
 }
 
+// Giữ lại component PromoBanner
 function PromoBanner() {
+  // ... (Không thay đổi)
   return (
     <div className="relative overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-white via-green-50 to-white">
       <Image src="/s17co/7.png" alt="Dịch vụ nổi bật S17" width={1600} height={500} className="w-full h-56 object-cover opacity-95" priority />
@@ -119,7 +135,8 @@ export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
 
-  const [services, setServices] = useState<any[]>(MOCK_SERVICES);
+  // Khởi tạo services là mảng rỗng thay vì MOCK_SERVICES
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -128,10 +145,16 @@ export default function ServicesPage() {
       try {
         const res = await fetch('/api/services');
         const json = await res.json();
-        if (mounted && json?.data) setServices(json.data);
+        // Giả định API trả về { data: Service[] }
+        if (mounted && json?.data) {
+          setServices(json.data);
+        } else if (mounted) {
+          // Xử lý trường hợp data rỗng hoặc không đúng định dạng
+          setServices([]);
+        }
       } catch (e) {
-        console.error('Failed to fetch services, using mock', e);
-        if (mounted) setServices(MOCK_SERVICES);
+        console.error('Failed to fetch services', e);
+        if (mounted) setServices([]); // Đặt services thành mảng rỗng khi fetch thất bại
       } finally {
         if (mounted) setLoading(false);
       }
@@ -140,6 +163,7 @@ export default function ServicesPage() {
     return () => { mounted = false };
   }, []);
 
+  // Logic tạo categories và filtering không thay đổi, chỉ dùng mảng services (động)
   const categories = useMemo(() => Array.from(new Set(services.map((s) => s.category || s.raw?.category || s.raw?.category?.title || 'Không phân loại'))), [services]);
 
   const filtered = useMemo(() => {
@@ -175,8 +199,27 @@ export default function ServicesPage() {
             <PromoBanner />
 
             {loading ? (
+              // Hiển thị một số placeholder/skeleton UI khi đang tải
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-5">
-                {MOCK_SERVICES.slice(0,6).map((svc) => (<ServiceCard key={svc.id} {...svc} />))}
+                {/* Thay thế bằng Skeleton Loader thực tế nếu có, ở đây tôi dùng một placeholder đơn giản */}
+                {[...Array(6)].map((_, index) => (
+                  <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden animate-pulse">
+                      <div className="w-full h-48 bg-gray-200"></div>
+                      <div className="p-4 space-y-2">
+                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                          <div className="h-3 bg-gray-200 rounded w-full"></div>
+                          <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                          <div className="flex justify-between pt-2">
+                              <div className="h-6 bg-gray-300 rounded w-1/4"></div>
+                              <div className="flex gap-2">
+                                  <div className="h-8 bg-gray-200 rounded-full w-16"></div>
+                                  <div className="h-8 bg-gray-200 rounded-full w-16"></div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="mt-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
