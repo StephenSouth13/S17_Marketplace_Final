@@ -164,8 +164,25 @@ export default function ServicesPage() {
   }, []);
 
   // Logic tạo categories và filtering không thay đổi, chỉ dùng mảng services (động)
-  const categories = useMemo(() => Array.from(new Set(services.map((s) => s.category || s.raw?.category || s.raw?.category?.title || 'Không phân loại'))), [services]);
+const categories = useMemo(() => Array.from(new Set(
+    services.map((s) => {
+        // Ưu tiên s.category (string)
+        if (s.category) return s.category;
+        
+        // Sau đó kiểm tra s.raw.category.title (string)
+        if (typeof s.raw?.category === 'object' && s.raw?.category?.title) {
+            return s.raw.category.title;
+        }
 
+        // Cuối cùng, kiểm tra nếu s.raw.category là string (nếu có thể)
+        if (typeof s.raw?.category === 'string') {
+             return s.raw.category;
+        }
+
+        // Giá trị mặc định
+        return 'Không phân loại';
+    })
+)), [services]);
   const filtered = useMemo(() => {
     let items = [...services];
     if (selectedCategory) items = items.filter((s) => (s.category || s.raw?.category?.title) === selectedCategory);

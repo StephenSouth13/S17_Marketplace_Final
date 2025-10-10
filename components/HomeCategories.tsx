@@ -1,11 +1,13 @@
 import React from "react";
 import Title from "./Title";
-import { Category } from "@/sanity.types";
+// Thay thế import Category gốc bằng kiểu ExtendedCategory của bạn
+import { ExtendedCategory } from "@/types/common"; 
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import Link from "next/link";
 
-const HomeCategories = ({ categories }: { categories: Category[] }) => {
+// Cập nhật kiểu cho prop 'categories'
+const HomeCategories = ({ categories }: { categories: ExtendedCategory[] }) => {
   return (
     <div className="bg-white border border-shop_light_green/20 my-10 md:my-20 p-5 lg:p-7 rounded-md">
       <Title className="border-b pb-3">Popular Categories</Title>
@@ -31,6 +33,7 @@ const HomeCategories = ({ categories }: { categories: Category[] }) => {
             <div className="space-y-1">
               <h3 className="text-base font-semibold">{category?.title}</h3>
               <p className="text-sm">
+                {/* Dòng này KHÔNG còn lỗi vì category đã có trường productCount */}
                 <span className="font-bold text-shop_dark_green">{`(${category?.productCount})`}</span>{" "}
                 items Available
               </p>
