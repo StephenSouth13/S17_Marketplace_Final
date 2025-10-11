@@ -1,104 +1,106 @@
-//sanity/schemaTypes/productType.ts
+// sanity/schemaTypes/productType.ts
+
+// Nhập biểu tượng và hàm định nghĩa từ Sanity
 import { TrolleyIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
+// Định nghĩa kiểu sản phẩm
 export const productType = defineType({
   name: "product",
-  title: "Products",
+  title: "Sản phẩm", // Tiêu đề tiếng Việt
   type: "document",
-  icon: TrolleyIcon,
+  icon: TrolleyIcon, // Biểu tượng Xe đẩy hàng
   fields: [
     defineField({
       name: "name",
-      title: "Product Name",
+      title: "Tên Sản phẩm",
       type: "string",
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required(), // Bắt buộc nhập
     }),
     defineField({
       name: "slug",
-      title: "Slug",
+      title: "Slug (Đường dẫn)",
       type: "slug",
       options: {
-        source: "name",
+        source: "name", // Tự động tạo từ trường 'name'
         maxLength: 96,
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required(), // Bắt buộc nhập
     }),
     defineField({
       name: "images",
-      title: "Product Images",
+      title: "Hình ảnh Sản phẩm",
       type: "array",
-      of: [{ type: "image", options: { hotspot: true } }],
+      of: [{ type: "image", options: { hotspot: true } }], // Cho phép chọn điểm nóng (hotspot)
     }),
     defineField({
       name: "description",
-      title: "Description",
+      title: "Mô tả",
       type: "string",
     }),
     defineField({
       name: "price",
-      title: "Price",
+      title: "Giá bán",
       type: "number",
-      validation: (Rule) => Rule.required().min(0),
+      validation: (Rule) => Rule.required().min(0), // Bắt buộc và phải lớn hơn hoặc bằng 0
     }),
     defineField({
       name: "discount",
-      title: "Discount",
+      title: "Chiết khấu (%)", // Đổi tên rõ ràng hơn là Chiết khấu (%)
       type: "number",
-      validation: (Rule) => Rule.required().min(0),
+      validation: (Rule) => Rule.required().min(0), // Bắt buộc và phải lớn hơn hoặc bằng 0
     }),
     defineField({
       name: "categories",
-      title: "Categories",
+      title: "Danh mục",
       type: "array",
-      of: [{ type: "reference", to: { type: "category" } }],
+      of: [{ type: "reference", to: { type: "category" } }], // Tham chiếu đến kiểu 'category'
     }),
     defineField({
       name: "stock",
-      title: "Stock",
+      title: "Tồn kho",
       type: "number",
-      validation: (Rule) => Rule.min(0),
+      validation: (Rule) => Rule.min(0), // Tối thiểu là 0
     }),
     defineField({
       name: "brand",
-      title: "Brand",
+      title: "Thương hiệu",
       type: "reference",
-      to: { type: "brand" },
+      to: { type: "brand" }, // Tham chiếu đến kiểu 'brand'
     }),
-
     defineField({
       name: "status",
-      title: "Product Status",
+      title: "Trạng thái Sản phẩm",
       type: "string",
       options: {
         list: [
-          { title: "New", value: "new" },
-          { title: "Hot", value: "hot" },
-          { title: "Sale", value: "sale" },
+          { title: "Mới", value: "new" }, // Mới (New)
+          { title: "Nổi bật", value: "hot" }, // Nổi bật/Bán chạy (Hot)
+          { title: "Khuyến mãi", value: "sale" }, // Giảm giá/Khuyến mãi (Sale)
         ],
       },
     }),
     defineField({
       name: "variant",
-      title: "Product Type (Phân Loại Chính)", // Đổi tên dễ hiểu hơn
+      title: "Phân loại Sản phẩm (Type)", // Đổi tên rõ ràng hơn trong bối cảnh S17
       type: "string",
       options: {
         list: [
-          // 🚨 Dùng giá trị tiếng Anh không dấu cho backend
+          // 🚨 Luôn giữ 'value' bằng tiếng Anh không dấu cho logic backend
           { title: "Thực phẩm", value: "food" },
           { title: "Đồ uống", value: "drink" },
           { title: "Dịch vụ", value: "service" },
           { title: "Khác", value: "others" },
         ],
-        layout: "radio", // Thường dùng radio cho lựa chọn duy nhất
+        layout: "radio", // Hiển thị dưới dạng radio
       },
-      validation: (Rule) => Rule.required(), // Nên yêu cầu trường này
+      validation: (Rule) => Rule.required(), // Bắt buộc chọn loại sản phẩm
     }),
     defineField({
       name: "isFeatured",
-      title: "Featured Product",
+      title: "Sản phẩm Nổi bật (Trang chủ)", // Tiêu đề tiếng Việt
       type: "boolean",
-      description: "Toggle to Featured on or off",
+      description: "Bật/Tắt để hiển thị sản phẩm này trên Trang chủ.",
       initialValue: false,
     }),
   ],
@@ -113,7 +115,7 @@ export const productType = defineType({
       const image = media && media[0];
       return {
         title: title,
-        subtitle: `$${subtitle}`,
+        subtitle: `$${subtitle}`, // Hiển thị giá kèm ký hiệu $ (Giữ nguyên định dạng này để dễ theo dõi)
         media: image,
       };
     },

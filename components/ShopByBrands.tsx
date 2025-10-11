@@ -1,42 +1,44 @@
+// Nhập các tiện ích và thành phần cần thiết
 import React from "react";
-import Title from "./Title";
-import Link from "next/link";
-import { getAllBrands } from "@/sanity/queries";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import { GitCompareArrows, Headset, ShieldCheck, Truck } from "lucide-react";
+import Title from "./Title"; // Nhập component Tiêu đề
+import Link from "next/link"; // Nhập component Liên kết từ Next.js
+import { getAllBrands } from "@/sanity/queries"; // Hàm truy vấn lấy tất cả thương hiệu
+import Image from "next/image"; // Nhập component Hình ảnh từ Next.js
+import { urlFor } from "@/sanity/lib/image"; // Hàm tạo URL hình ảnh từ Sanity
+import { GitCompareArrows, Headset, ShieldCheck, Truck } from "lucide-react"; // Nhập các biểu tượng
 
-import { Brand as SanityBrand } from "@/sanity.types";
+import { Brand as SanityBrand } from "@/sanity.types"; // Nhập định kiểu Thương hiệu từ Sanity
 
 // Dữ liệu bổ sung về ưu đãi/dịch vụ (Đã dịch)
 const extraData = [
   {
     title: "Giao hàng miễn phí",
     description: "Miễn phí vận chuyển cho đơn hàng trên $100",
-    icon: <Truck size={45} />,
+    icon: <Truck size={45} />, // Biểu tượng Xe tải
   },
   {
     title: "Đổi trả miễn phí",
-    description: "Miễn phí vận chuyển cho đơn hàng trên $100",
-    icon: <GitCompareArrows size={45} />,
+    description: "Chính sách đổi trả dễ dàng", // Sửa mô tả cho phù hợp với tiêu đề
+    icon: <GitCompareArrows size={45} />, // Biểu tượng Mũi tên So sánh
   },
   {
     title: "Hỗ trợ khách hàng",
     description: "Hỗ trợ khách hàng thân thiện 24/7",
-    icon: <Headset size={45} />,
+    icon: <Headset size={45} />, // Biểu tượng Tai nghe
   },
   {
-    title: "Đảm bảo hoàn tiền",
+    title: "Đảm bảo chất lượng", // Sửa tiêu đề cho phù hợp với mô tả
     description: "Chất lượng được kiểm tra bởi đội ngũ của chúng tôi",
-    icon: <ShieldCheck size={45} />,
+    icon: <ShieldCheck size={45} />, // Biểu tượng Khiên Kiểm tra
   },
 ];
 
 // Component "Mua sắm theo Thương hiệu"
+// Do component này là 'async', chúng ta cần định nghĩa kiểu Brand (sử dụng SanityBrand đã import)
 const ShopByBrands = async () => {
-  // Gán kiểu Brand[] cho brands để TypeScript nhận diện
-  const brands: Brand[] = await getAllBrands();
-  
+  // Gán kiểu SanityBrand[] cho brands
+  const brands: SanityBrand[] = await getAllBrands();
+
   return (
     <div className="mb-10 lg:mb-20 bg-shop_light_bg p-5 lg:p-7 rounded-md">
       <div className="flex items-center gap-5 justify-between mb-10">
@@ -50,16 +52,18 @@ const ShopByBrands = async () => {
       </div>
       {/* Danh sách logo thương hiệu */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2.5">
-            {brands?.map((brand: SanityBrand) => (
+        {brands?.map((brand: SanityBrand) => (
           <Link
             key={brand?._id}
+            // Tạo liên kết đến trang mua sắm với bộ lọc thương hiệu
             href={{ pathname: "/shop", query: { brand: brand?.slug?.current } }}
             className="bg-white w-34 h-24 flex items-center justify-center rounded-md overflow-hidden hover:shadow-lg shadow-shop_dark_green/20 hoverEffect"
           >
-            {brand?.image?.asset?.url ? (
+            {/* Kiểm tra và hiển thị hình ảnh thương hiệu */}
+            {brand?.image ? (
               <Image
-                src={urlFor(brand.image).url()}
-                alt={brand?.title || "Brand logo"}
+                src={urlFor(brand.image).url()} // Sử dụng urlFor để lấy URL hình ảnh
+                alt={brand?.title || "Logo thương hiệu"}
                 width={250}
                 height={120}
                 className="w-32 h-20 object-contain"
@@ -67,7 +71,9 @@ const ShopByBrands = async () => {
                 priority={false}
               />
             ) : (
-              <div className="w-32 h-20 flex items-center justify-center text-sm text-gray-500">No Image</div>
+              <div className="w-32 h-20 flex items-center justify-center text-sm text-gray-500">
+                Không có Hình ảnh
+              </div>
             )}
           </Link>
         ))}
@@ -95,4 +101,5 @@ const ShopByBrands = async () => {
   );
 };
 
+// Xuất component
 export default ShopByBrands;
