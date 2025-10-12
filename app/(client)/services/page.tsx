@@ -54,7 +54,7 @@ function ServiceCard({ service }: { service: Service }) {
       <Link href={`/services/${slug.current}`} className="block relative">
         <Image
           src={mainImage ? urlFor(mainImage).width(800).url() : "/s17co/placeholder.png"}
-          alt={title}
+          alt={title || "Dịch vụ S17"}
           width={800}
           height={500}
           className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
@@ -72,7 +72,7 @@ function ServiceCard({ service }: { service: Service }) {
 
         <div className="flex items-center gap-1 text-yellow-400">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} size={15} className="fill-yellow-400" />
+            <Star key={`star-${i}`} size={15} className="fill-yellow-400" />
           ))}
           <span className="text-xs text-gray-500 ml-1">(5.0)</span>
         </div>
@@ -114,7 +114,7 @@ function ServiceCategories({
       </div>
       <RadioGroup value={selected ?? ""} className="space-y-2">
         {categories.map((cat) => (
-          <div key={cat} onClick={() => onChange(cat)} className="flex items-center gap-2 cursor-pointer">
+          <div key={`cat-${cat}`} onClick={() => onChange(cat)} className="flex items-center gap-2 cursor-pointer">
             <RadioGroupItem value={cat} id={cat} />
             <Label
               htmlFor={cat}
@@ -161,7 +161,7 @@ function PriceFilter({
       </div>
       <RadioGroup value={selected ?? ""} className="space-y-2">
         {PRICE_RANGES.map((p) => (
-          <div key={p.value} onClick={() => onChange(p.value)} className="flex items-center gap-2 cursor-pointer">
+          <div key={`price-${p.value}`} onClick={() => onChange(p.value)} className="flex items-center gap-2 cursor-pointer">
             <RadioGroupItem value={p.value} id={p.value} />
             <Label
               htmlFor={p.value}
@@ -197,7 +197,7 @@ function PromoBanner() {
     >
       <Image
         src="/s17co/7.png"
-        alt="Ưu đãi đặc biệt"
+        alt="Ưu đãi đặc biệt S17"
         width={1600}
         height={500}
         className="w-full h-56 object-cover opacity-90"
@@ -280,7 +280,6 @@ export default function ServicesPage() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Bộ lọc */}
           <aside className="md:w-72 md:sticky md:top-24 md:self-start space-y-6">
             <ServiceCategories
               categories={categories}
@@ -290,18 +289,17 @@ export default function ServicesPage() {
             <PriceFilter selected={selectedPrice} onChange={setSelectedPrice} />
           </aside>
 
-          {/* Danh sách */}
           <main className="flex-1">
             <PromoBanner />
 
             {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mt-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="animate-pulse bg-white rounded-2xl h-64 shadow-sm" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={`skeleton-${i}`} className="animate-pulse bg-white rounded-2xl h-64 shadow-sm" />
                 ))}
               </div>
             ) : (
-              <motion.div layout className="mt-6 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+              <motion.div layout className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filtered.map((svc) => (
                   <ServiceCard key={svc._id} service={svc} />
                 ))}
