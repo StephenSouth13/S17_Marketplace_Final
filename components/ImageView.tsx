@@ -27,47 +27,75 @@ interface Props {
 
 const ImageView = ({ images = [], isStock }: Props) => {
   const [active, setActive] = useState(images[0]);
-  console.log(active);
+
+  if (!images.length) return null;
 
   return (
-    <div className="w-full md:w-1/2 space-y-2 md:space-y-4">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={active?._key}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-h-[550px] min-h-[450px] border border-darkColor/10 rounded-md group overflow-hidden"
-        >
-          <Image
-            src={urlFor(active).url()}
-            alt="productImage"
-            width={700}
-            height={700}
-            priority
-            className={`w-full h-96 max-h-[550px] min-h-[500px] object-contain group-hover:scale-110 hoverEffect rounded-md ${
-              isStock === 0 ? "opacity-50" : ""
-            }`}
-          />
-        </motion.div>
-      </AnimatePresence>
-      <div className="grid grid-cols-6 gap-2 h-20 md:h-24">
-        {images?.map((image) => (
-          <button
-            key={image?._key}
-            onClick={() => setActive(image)}
-            className={`border rounded-md overflow-hidden ${active?._key === image?._key ? "border-darkColor opacity-100" : "opacity-80"}`}
+    <div className="w-full md:w-1/2 space-y-4">
+      {/* Ảnh chính */}
+      <div className="relative group rounded-2xl overflow-hidden border border-gray-100 shadow-sm bg-gradient-to-br from-white via-gray-50 to-gray-100">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={active?._key}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.5 }}
+            className="relative"
           >
             <Image
-              src={urlFor(image).url()}
-              alt={`Thumbnail ${image._key}`}
-              width={100}
-              height={100}
-              className="w-full h-auto object-contain"
+              src={urlFor(active).width(800).height(800).url()}
+              alt="productImage"
+              width={800}
+              height={800}
+              priority
+              className={`w-full h-[480px] md:h-[540px] object-contain transition-transform duration-700 ease-out group-hover:scale-105 ${
+                isStock === 0 ? "opacity-50 grayscale" : ""
+              }`}
             />
-          </button>
-        ))}
+            {/* Overlay Hết hàng */}
+            {isStock === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+                <p className="text-white text-lg font-semibold tracking-wide uppercase">
+                  Hết hàng
+                </p>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Hiệu ứng ánh sáng hover */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none bg-gradient-to-tr from-white/10 via-transparent to-white/20" />
+      </div>
+
+      {/* Thumbnail */}
+      <div className="grid grid-cols-6 gap-2">
+        {images.map((image) => {
+          const isActive = active?._key === image._key;
+          return (
+            <motion.button
+              key={image._key}
+              whileHover={{ scale: 1.05 }}
+              onClick={() => setActive(image)}
+              className={`relative overflow-hidden rounded-lg border-2 transition-all duration-300 ${
+                isActive
+                  ? "border-emerald-500 shadow-md"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <Image
+                src={urlFor(image).width(150).height(150).url()}
+                alt={`Thumbnail ${image._key}`}
+                width={100}
+                height={100}
+                className="w-full h-20 md:h-24 object-contain bg-white rounded-md"
+              />
+              {isActive && (
+                <div className="absolute inset-0 ring-2 ring-emerald-400/70 rounded-lg pointer-events-none" />
+              )}
+            </motion.button>
+          );
+        })}
       </div>
     </div>
   );

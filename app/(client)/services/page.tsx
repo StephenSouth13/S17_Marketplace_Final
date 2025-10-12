@@ -1,251 +1,317 @@
 "use client";
 
-import Image from "next/image";
 import React, { useMemo, useState, useEffect } from "react";
-import Container from "@/components/Container";
-import Title from "@/components/Title";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Star, Filter, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Star } from "lucide-react";
+import Container from "@/components/Container";
+import Title from "@/components/Title";
+import { urlFor } from "@/sanity/lib/image";
 
-// Định nghĩa kiểu dữ liệu cho Service (cần thiết sau khi loại bỏ mockup)
 interface Service {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  category: string;
-  price: number;
-  rating: number;
-  image: string | null;
-  // Thêm các trường dữ liệu thô nếu cần thiết, dựa trên logic lọc
-  raw?: {
-    category?: {
-      title?: string;
-    };
-  };
+  _id: string;
+  slug: { current: string };
+  title: string;
+  excerpt: string;
+  mainImage: any | null;
+  categoryTitle: string;
+  categorySlug: string;
+  pricingModel: "tiered" | "custom";
+  priceRange: { min: number; max: number } | null;
+  minPrice?: number;
 }
 
-// Giữ lại hàm formatVND
-const formatVND = (amount: number) =>
+const formatVND = (amount?: number | null) =>
   Number(amount ?? 0).toLocaleString("vi-VN", {
     style: "currency",
     currency: "VND",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
   });
 
-// Giữ lại component ServiceCard
-function ServiceCard({ name, description, price, rating, image }: { name: string; description: string; price: number; rating: number; image: string | null; }) {
-  return (
-    <div className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden">
-      <div className="relative bg-gray-50">
-        <Image src={image || "/s17co/placeholder.png"} alt={name} width={600} height={400} className="w-full h-48 object-cover" />
-      </div>
-      <div className="p-4 flex flex-col gap-2">
-        <Title className="text-base font-semibold leading-snug group-hover:text-shop_dark_green">{name}</Title>
-        <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
+/* ----------------------------------- CARD ----------------------------------- */
+function ServiceCard({ service }: { service: Service }) {
+  const { slug, title, excerpt, mainImage, pricingModel, priceRange, minPrice } = service;
+  const displayPrice = () =>
+    pricingModel === "custom" && priceRange?.min
+      ? `Từ ${formatVND(priceRange.min)}`
+      : pricingModel === "tiered" && minPrice
+      ? `Gói từ ${formatVND(minPrice)}`
+      : "Liên hệ báo giá";
 
-        <div className="flex items-center gap-1 mt-1">
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.25 }}
+      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl overflow-hidden group"
+    >
+      <Link href={`/services/${slug.current}`} className="block relative">
+        <Image
+          src={mainImage ? urlFor(mainImage).width(800).url() : "/s17co/placeholder.png"}
+          alt={title}
+          width={800}
+          height={500}
+          className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-all"></div>
+      </Link>
+
+      <div className="p-5 flex flex-col gap-3">
+        <Link href={`/services/${slug.current}`}>
+          <h3 className="text-[17px] font-semibold text-gray-900 group-hover:text-emerald-600 line-clamp-2 leading-snug">
+            {title}
+          </h3>
+        </Link>
+        <p className="text-sm text-gray-600 line-clamp-2">{excerpt}</p>
+
+        <div className="flex items-center gap-1 text-yellow-400">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} size={16} className={i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} />
+            <Star key={i} size={15} className="fill-yellow-400" />
           ))}
+          <span className="text-xs text-gray-500 ml-1">(5.0)</span>
         </div>
 
         <div className="flex items-center justify-between mt-2">
-          <span className="text-lg font-bold bg-gradient-to-r from-shop_light_green to-emerald-500 bg-clip-text text-transparent">{formatVND(price)}</span>
-          <div className="flex gap-2">
-            <Button size="sm" className="rounded-full px-4">Đặt ngay</Button>
-            <Button size="sm" variant="outline" className="rounded-full px-4">Xem chi tiết</Button>
-          </div>
+          <span className="font-semibold text-lg bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">
+            {displayPrice()}
+          </span>
+          <Link href={`/services/${slug.current}`}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-full px-4 border-emerald-500 text-emerald-600 hover:bg-emerald-600 hover:text-white"
+            >
+              Xem chi tiết
+            </Button>
+          </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-// Giữ lại component ServiceCategories
-function ServiceCategories({ categories, selected, onChange }: { categories: string[]; selected: string | null; onChange: (val: string | null) => void; }) {
-  // ... (Không thay đổi)
+/* ----------------------------------- FILTER ----------------------------------- */
+function ServiceCategories({
+  categories,
+  selected,
+  onChange,
+}: {
+  categories: string[];
+  selected: string | null;
+  onChange: (v: string | null) => void;
+}) {
   return (
-    <div className="w-full bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-      <Title className="text-base font-black">Danh mục dịch vụ</Title>
-      <RadioGroup value={selected ?? ""} className="mt-3 space-y-2">
+    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex items-center gap-2 text-emerald-700 font-semibold mb-3">
+        <Filter size={16} />
+        Danh mục dịch vụ
+      </div>
+      <RadioGroup value={selected ?? ""} className="space-y-2">
         {categories.map((cat) => (
-          <div key={cat} onClick={() => onChange(cat)} className="flex items-center gap-2 hover:cursor-pointer">
-            <RadioGroupItem value={cat} id={cat} className="rounded-sm" />
-            <Label htmlFor={cat} className={selected === cat ? "font-semibold text-shop_dark_green" : "font-normal"}>{cat}</Label>
+          <div key={cat} onClick={() => onChange(cat)} className="flex items-center gap-2 cursor-pointer">
+            <RadioGroupItem value={cat} id={cat} />
+            <Label
+              htmlFor={cat}
+              className={`${
+                selected === cat ? "text-emerald-700 font-semibold" : "text-gray-700"
+              } hover:text-emerald-600`}
+            >
+              {cat}
+            </Label>
           </div>
         ))}
       </RadioGroup>
       {selected && (
-        <button onClick={() => onChange(null)} className="text-sm font-medium mt-2 underline underline-offset-2 decoration-[1px] hover:text-shop_dark_green hoverEffect text-left">Xóa lựa chọn</button>
+        <button
+          onClick={() => onChange(null)}
+          className="text-xs mt-3 underline text-emerald-600 hover:text-red-500"
+        >
+          Xóa lựa chọn
+        </button>
       )}
     </div>
   );
 }
 
 const PRICE_RANGES = [
-  { label: "Dưới 1.000.000 ₫", value: "0-1000000" },
-  { label: "1.000.000 ₫ – 2.000.000 ₫", value: "1000000-2000000" },
-  { label: "2.000.000 ₫ – 5.000.000 ₫", value: "2000000-5000000" },
-  { label: "Trên 5.000.000 ₫", value: "5000000-100000000" },
+  { label: "Dưới 10.000.000 ₫", value: "0-10000000" },
+  { label: "10.000.000 ₫ – 30.000.000 ₫", value: "10000000-30000000" },
+  { label: "30.000.000 ₫ – 80.000.000 ₫", value: "30000000-80000000" },
+  { label: "Trên 80.000.000 ₫", value: "80000000-999999999" },
 ];
 
-// Giữ lại component PriceFilter
-function PriceFilter({ selected, onChange }: { selected: string | null; onChange: (val: string | null) => void; }) {
-  // ... (Không thay đổi)
+function PriceFilter({
+  selected,
+  onChange,
+}: {
+  selected: string | null;
+  onChange: (v: string | null) => void;
+}) {
   return (
-    <div className="w-full bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-      <Title className="text-base font-black">Khoảng giá</Title>
-      <RadioGroup value={selected ?? ""} className="mt-3 space-y-2">
+    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex items-center gap-2 text-emerald-700 font-semibold mb-3">
+        <Sparkles size={16} />
+        Khoảng giá khởi điểm
+      </div>
+      <RadioGroup value={selected ?? ""} className="space-y-2">
         {PRICE_RANGES.map((p) => (
-          <div key={p.value} onClick={() => onChange(p.value)} className="flex items-center gap-2 hover:cursor-pointer">
-            <RadioGroupItem value={p.value} id={p.value} className="rounded-sm" />
-            <Label htmlFor={p.value} className={selected === p.value ? "font-semibold text-shop_dark_green" : "font-normal"}>{p.label}</Label>
+          <div key={p.value} onClick={() => onChange(p.value)} className="flex items-center gap-2 cursor-pointer">
+            <RadioGroupItem value={p.value} id={p.value} />
+            <Label
+              htmlFor={p.value}
+              className={`${
+                selected === p.value ? "text-emerald-700 font-semibold" : "text-gray-700"
+              } hover:text-emerald-600`}
+            >
+              {p.label}
+            </Label>
           </div>
         ))}
       </RadioGroup>
       {selected && (
-        <button onClick={() => onChange(null)} className="text-sm font-medium mt-2 underline underline-offset-2 decoration-[1px] hover:text-shop_dark_green hoverEffect text-left">Xóa lựa chọn</button>
+        <button
+          onClick={() => onChange(null)}
+          className="text-xs mt-3 underline text-emerald-600 hover:text-red-500"
+        >
+          Xóa lựa chọn
+        </button>
       )}
     </div>
   );
 }
 
-// Giữ lại component PromoBanner
+/* ----------------------------------- PROMO ----------------------------------- */
 function PromoBanner() {
-  // ... (Không thay đổi)
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-white via-green-50 to-white">
-      <Image src="/s17co/7.png" alt="Dịch vụ nổi bật S17" width={1600} height={500} className="w-full h-56 object-cover opacity-95" priority />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
-      <div className="absolute left-6 top-6 text-white drop-shadow">
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="relative overflow-hidden rounded-3xl border border-emerald-100 bg-gradient-to-br from-white via-emerald-50 to-white"
+    >
+      <Image
+        src="/s17co/7.png"
+        alt="Ưu đãi đặc biệt"
+        width={1600}
+        height={500}
+        className="w-full h-56 object-cover opacity-90"
+        priority
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+      <div className="absolute left-8 top-8 text-white drop-shadow-md">
         <p className="text-xs uppercase tracking-wider">Ưu đãi tuần này</p>
-        <h3 className="text-2xl font-bold leading-tight">Nâng cấp thương hiệu cùng S17</h3>
+        <h3 className="text-3xl font-bold leading-tight">Nâng cấp thương hiệu cùng S17</h3>
         <p className="text-sm opacity-95">Giảm 15% cho gói thiết kế thương hiệu</p>
-        <Button className="mt-4 rounded-full bg-shop_light_green hover:bg-shop_btn_dark_green">Nhận ưu đãi</Button>
+        <Button className="mt-4 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-md">
+          Nhận ưu đãi ngay
+        </Button>
       </div>
-    </div>
+    </motion.div>
   );
+}
+
+/* ----------------------------------- MAIN ----------------------------------- */
+async function fetchServicesFromApi(): Promise<Service[]> {
+  const res = await fetch("/api/services", { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch services");
+  const json = await res.json();
+  return json.data || [];
 }
 
 export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
-
-  // Khởi tạo services là mảng rỗng thay vì MOCK_SERVICES
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
-    async function fetchServices() {
-      try {
-        const res = await fetch('/api/services');
-        const json = await res.json();
-        // Giả định API trả về { data: Service[] }
-        if (mounted && json?.data) {
-          setServices(json.data);
-        } else if (mounted) {
-          // Xử lý trường hợp data rỗng hoặc không đúng định dạng
-          setServices([]);
-        }
-      } catch (e) {
-        console.error('Failed to fetch services', e);
-        if (mounted) setServices([]); // Đặt services thành mảng rỗng khi fetch thất bại
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-    fetchServices();
-    return () => { mounted = false };
+    fetchServicesFromApi()
+      .then((data) => mounted && setServices(data))
+      .catch(() => mounted && setServices([]))
+      .finally(() => mounted && setLoading(false));
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // Logic tạo categories và filtering không thay đổi, chỉ dùng mảng services (động)
-const categories = useMemo(() => Array.from(new Set(
-    services.map((s) => {
-        // Ưu tiên s.category (string)
-        if (s.category) return s.category;
-        
-        // Sau đó kiểm tra s.raw.category.title (string)
-        if (typeof s.raw?.category === 'object' && s.raw?.category?.title) {
-            return s.raw.category.title;
-        }
+  const categories = useMemo(
+    () => Array.from(new Set(services.map((s) => s.categoryTitle))).filter(Boolean),
+    [services]
+  );
 
-        // Cuối cùng, kiểm tra nếu s.raw.category là string (nếu có thể)
-        if (typeof s.raw?.category === 'string') {
-             return s.raw.category;
-        }
-
-        // Giá trị mặc định
-        return 'Không phân loại';
-    })
-)), [services]);
   const filtered = useMemo(() => {
     let items = [...services];
-    if (selectedCategory) items = items.filter((s) => (s.category || s.raw?.category?.title) === selectedCategory);
+    if (selectedCategory) items = items.filter((s) => s.categoryTitle === selectedCategory);
     if (selectedPrice) {
-      const [min, max] = selectedPrice.split('-').map((n) => Number(n));
-      items = items.filter((s) => (s.price ?? 0) >= min && (s.price ?? 0) <= max);
+      const [min, max] = selectedPrice.split("-").map(Number);
+      items = items.filter((s) => {
+        const price = s.pricingModel === "custom" ? s.priceRange?.min : s.minPrice;
+        return price && price >= min && price <= max;
+      });
     }
     return items;
   }, [services, selectedCategory, selectedPrice]);
 
   return (
-    <div className="border-t bg-gradient-to-b from-white via-[#fafafa] to-[#f3f3f3]">
+    <div className="bg-gradient-to-b from-white via-emerald-50/50 to-white border-t">
       <Container className="mt-6">
-        <div className="sticky top-0 z-10 mb-4 bg-white/70 backdrop-blur-md rounded-md shadow-sm px-4 py-3 flex items-center justify-between border border-gray-100">
-          <Title className="text-lg font-semibold tracking-wide text-gray-800 uppercase">Dịch vụ của S17</Title>
+        <div className="sticky top-0 z-10 mb-6 bg-white/70 backdrop-blur-lg rounded-xl px-5 py-4 shadow-sm flex items-center justify-between border border-gray-100">
+          <Title className="text-lg font-semibold tracking-wide text-gray-800 uppercase">
+            Dịch vụ chuyên nghiệp tại S17
+          </Title>
           {(selectedCategory || selectedPrice) && (
-            <button onClick={() => { setSelectedCategory(null); setSelectedPrice(null); }} className="text-shop_dark_green underline text-sm font-medium hover:text-red-500 transition-colors">Đặt lại bộ lọc</button>
+            <button
+              onClick={() => {
+                setSelectedCategory(null);
+                setSelectedPrice(null);
+              }}
+              className="text-emerald-700 underline text-sm font-medium hover:text-red-500 transition-colors"
+            >
+              Đặt lại bộ lọc
+            </button>
           )}
         </div>
 
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Bên trái: Bộ lọc */}
-          <aside className="md:w-64 md:sticky md:top-24 md:self-start h-auto md:h-[calc(100vh-180px)] overflow-y-auto scrollbar-hide border border-gray-200 rounded-xl bg-white p-4 shadow-sm">
-            <ServiceCategories categories={categories} selected={selectedCategory} onChange={setSelectedCategory} />
-            <div className="mt-4" />
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Bộ lọc */}
+          <aside className="md:w-72 md:sticky md:top-24 md:self-start space-y-6">
+            <ServiceCategories
+              categories={categories}
+              selected={selectedCategory}
+              onChange={setSelectedCategory}
+            />
             <PriceFilter selected={selectedPrice} onChange={setSelectedPrice} />
           </aside>
 
-          {/* Bên phải: Banner + danh sách dịch vụ */}
+          {/* Danh sách */}
           <main className="flex-1">
             <PromoBanner />
 
             {loading ? (
-              // Hiển thị một số placeholder/skeleton UI khi đang tải
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-5">
-                {/* Thay thế bằng Skeleton Loader thực tế nếu có, ở đây tôi dùng một placeholder đơn giản */}
-                {[...Array(6)].map((_, index) => (
-                  <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden animate-pulse">
-                      <div className="w-full h-48 bg-gray-200"></div>
-                      <div className="p-4 space-y-2">
-                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                          <div className="h-3 bg-gray-200 rounded w-full"></div>
-                          <div className="h-3 bg-gray-200 rounded w-5/6"></div>
-                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                          <div className="flex justify-between pt-2">
-                              <div className="h-6 bg-gray-300 rounded w-1/4"></div>
-                              <div className="flex gap-2">
-                                  <div className="h-8 bg-gray-200 rounded-full w-16"></div>
-                                  <div className="h-8 bg-gray-200 rounded-full w-16"></div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mt-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="animate-pulse bg-white rounded-2xl h-64 shadow-sm" />
                 ))}
               </div>
             ) : (
-              <div className="mt-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                {filtered.map((svc) => (<ServiceCard key={svc.id} {...svc} />))}
-              </div>
+              <motion.div layout className="mt-6 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filtered.map((svc) => (
+                  <ServiceCard key={svc._id} service={svc} />
+                ))}
+              </motion.div>
             )}
 
             {!loading && filtered.length === 0 && (
-              <div className="bg-white mt-10 rounded-xl shadow-sm border border-gray-200 p-10 text-center text-gray-600">Không có dịch vụ phù hợp với bộ lọc hiện tại.</div>
+              <div className="text-center text-gray-600 bg-white mt-12 rounded-2xl shadow-sm border border-gray-100 p-10">
+                Không có dịch vụ phù hợp với bộ lọc hiện tại.
+              </div>
             )}
           </main>
         </div>

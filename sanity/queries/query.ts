@@ -1,104 +1,134 @@
 const BRANDS_QUERY = `*[_type=='brand'] | order(name asc) `;
 
 const LATEST_BLOG_QUERY = ` *[_type == 'blog' && isLatest == true]|order(name asc){
-      ...,
-      blogcategories[]->{
-      title
-    }
-    }`;
+      ...,
+      blogcategories[]->{
+      title
+    }
+    }`;
 
 const DEAL_PRODUCTS = `*[_type == 'product' && status == 'hot'] | order(name asc){
-    ...,"categories": categories[]->title
-  }`;
+    ...,"categories": categories[]->title
+  }`;
 
 const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug] | order(name asc) [0]`;
 
 const BRAND_QUERY = `*[_type == "product" && slug.current == $slug]{
-  "brandName": brand->title
-  }`;
+  "brandName": brand->title
+  }`;
 
 const MY_ORDERS_QUERY = `*[_type == 'order' && clerkUserId == $userId] | order(orderData desc){
 ...,products[]{
-  ...,product->
+  ...,product->
 }
 }`;
 const GET_ALL_BLOG = `*[_type == 'blog'] | order(publishedAt desc)[0...$quantity]{
-  ...,
-     blogcategories[]->{
-    title
+  ...,
+     blogcategories[]->{
+    title
 }
-    }
-  `;
+    }
+  `;
 
 const SINGLE_BLOG_QUERY = `*[_type == "blog" && slug.current == $slug][0]{
-  ...,
-    author->{
-    name,
-    image,
-  },
-  blogcategories[]->{
-    title,
-    "slug": slug.current,
-  },
+  ...,
+    author->{
+    name,
+    image,
+  },
+  blogcategories[]->{
+    title,
+    "slug": slug.current,
+  },
 }`;
 
 const BLOG_CATEGORIES = `*[_type == "blog"]{
-     blogcategories[]->{
-    ...
-    }
-  }`;
+     blogcategories[]->{
+    ...
+    }
+  }`;
 
 const OTHERS_BLOG_QUERY = `*[
-  _type == "blog"
-  && defined(slug.current)
-  && slug.current != $slug
+  _type == "blog"
+  && defined(slug.current)
+  && slug.current != $slug
 ]|order(publishedAt desc)[0...$quantity]{
 ...
-  publishedAt,
-  title,
-  mainImage,
-  slug,
-  author->{
-    name,
-    image,
-  },
-  categories[]->{
-    title,
-    "slug": slug.current,
-  }
+  publishedAt,
+  title,
+  mainImage,
+  slug,
+  author->{
+    name,
+    image,
+  },
+  categories[]->{
+    title,
+    "slug": slug.current,
+  }
 }`;
-// Services queries
+
+// SERVICES QUERIES: Đã cập nhật để hỗ trợ pricingModel và lấy giá min
 const SERVICES_QUERY = `*[_type == "service"] | order(publishedAt desc){
   _id,
   title,
   "slug": slug.current,
   excerpt,
   mainImage,
-  "category": category->title,
+  "categoryTitle": category->title,
   "categorySlug": category->slug.current,
-  priceRange,
   isFeatured,
-  publishedAt
+  publishedAt,
+  pricingModel,
+  
+  pricingModel == "custom" => {
+    priceRange
+  },
+  
+  pricingModel == "tiered" => {
+    "minPrice": plans[0].price
+  }
 }`;
 
+// SERVICE_BY_SLUG_QUERY: Đã sửa lỗi, sử dụng $slug làm tham số
 const SERVICE_BY_SLUG_QUERY = `*[_type == "service" && slug.current == $slug][0]{
-  ..., "category": category->{title, "slug": slug.current}
+  _id,
+  title,
+  slug,
+  excerpt,
+  mainImage,
+  body,
+  publishedAt,
+  
+  "category": category->{title, "slug": slug.current},
+  
+  pricingModel,
+  priceRange,
+  
+  pricingModel == "tiered" => {
+    plans[]{
+      name,
+      price,
+      features,
+      isPopular
+    }
+  }
 }`;
 
 const SERVICE_CATEGORIES = `*[_type == "serviceCategory"] | order(title asc){..., "slug": slug.current}`;
 
 export {
-  BRANDS_QUERY,
-  LATEST_BLOG_QUERY,
-  DEAL_PRODUCTS,
-  PRODUCT_BY_SLUG_QUERY,
-  BRAND_QUERY,
-  MY_ORDERS_QUERY,
-  GET_ALL_BLOG,
-  SINGLE_BLOG_QUERY,
-  BLOG_CATEGORIES,
-  OTHERS_BLOG_QUERY,
-  SERVICES_QUERY,
-  SERVICE_BY_SLUG_QUERY,
-  SERVICE_CATEGORIES,
+  BRANDS_QUERY,
+  LATEST_BLOG_QUERY,
+  DEAL_PRODUCTS,
+  PRODUCT_BY_SLUG_QUERY,
+  BRAND_QUERY,
+  MY_ORDERS_QUERY,
+  GET_ALL_BLOG,
+  SINGLE_BLOG_QUERY,
+  BLOG_CATEGORIES,
+  OTHERS_BLOG_QUERY,
+  SERVICES_QUERY,
+  SERVICE_BY_SLUG_QUERY,
+  SERVICE_CATEGORIES,
 };

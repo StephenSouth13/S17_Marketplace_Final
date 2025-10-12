@@ -1,84 +1,92 @@
 // Nhập các tiện ích và thành phần cần thiết
-import Container from "@/components/Container"; // Nhập component Container
-import Title from "@/components/Title"; // Nhập component Tiêu đề
-import { urlFor } from "@/sanity/lib/image"; // Hàm tạo URL hình ảnh từ Sanity
-import { getAllBlogs } from "@/sanity/queries"; // Hàm truy vấn lấy tất cả bài viết blog
-import dayjs from "dayjs"; // Thư viện xử lý ngày tháng
-import { Calendar } from "lucide-react"; // Biểu tượng Lịch
-import Image from "next/image"; // Component Hình ảnh từ Next.js
-import Link from "next/link"; // Component Liên kết từ Next.js
+import Container from "@/components/Container";
+import Title from "@/components/Title";
+import { urlFor } from "@/sanity/lib/image";
+import { getAllBlogs } from "@/sanity/queries";
+import dayjs from "dayjs";
+import { Calendar } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
-// Định nghĩa giao diện/kiểu cho bài viết blog
+// Định nghĩa kiểu dữ liệu blog
 interface Blog {
   _id: string;
-  title: string; // Tiêu đề bài viết
-  slug: { current: string }; // Slug (đường dẫn thân thiện)
-  publishedAt: string; // Ngày xuất bản
-  mainImage?: any; // Hình ảnh chính
-  blogcategories?: { title: string }[]; // Danh mục của blog
+  title: string;
+  slug: { current: string };
+  publishedAt: string;
+  mainImage?: any;
+  blogcategories?: { title: string }[];
 }
 
-// Component Trang Blog (Sử dụng Async Component)
+// Component Trang Blog
 const BlogPage = async () => {
-  // Lấy 6 bài viết blog mới nhất
   const blogs: Blog[] = await getAllBlogs(6);
 
   return (
-    <div>
-      <Container>
-        <Title>Trang Blog</Title>
-        {/* Lưới hiển thị các bài viết blog */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 md:mt-10">
-          {blogs?.map((blog: Blog) => (
-            <div key={blog._id} className="rounded-md overflow-hidden group">
-              {/* Khu vực Hình ảnh chính */}
+    <div className="bg-gradient-to-b from-white via-gray-50 to-gray-100">
+      <Container className="py-10">
+        <div className="text-center mb-10">
+          <Title>Trang Blog</Title>
+          <p className="text-gray-500 mt-2 text-sm md:text-base">
+            Nơi chia sẻ kiến thức, tin tức và xu hướng mới nhất.
+          </p>
+        </div>
+
+        {/* Lưới hiển thị blog */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {blogs?.map((blog) => (
+            <Link
+              href={`/blog/${blog.slug.current}`}
+              key={blog._id}
+              className="group rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-500"
+            >
+              {/* Hình ảnh */}
               {blog.mainImage && (
-                <Image
-                  src={urlFor(blog.mainImage).url()} // Lấy URL hình ảnh
-                  alt="Ảnh blog"
-                  width={500}
-                  height={500}
-                  className="w-full max-h-80 object-cover"
-                />
-              )}
-              {/* Khu vực Nội dung bài viết */}
-              <div className="bg-gray-100 p-5">
-                {/* Khu vực Danh mục và Ngày tháng */}
-                <div className="text-xs flex items-center gap-5">
-                  {/* Danh mục Blog */}
-                  <div className="flex items-center relative group cursor-pointer">
-                    {blog.blogcategories?.map(
-                      (item: { title: string }, index: number) => (
-                        <p
-                          key={index}
-                          className="font-semibold text-shop_dark_green tracking-wider"
-                        >
-                          {item.title}
-                        </p>
-                      )
-                    )}
-                    {/* Hiệu ứng gạch chân khi hover */}
-                    <span className="absolute left-0 -bottom-1.5 bg-lightColor/30 inline-block w-full h-[2px] group-hover:bg-shop_dark_green hover:cursor-pointer hoverEffect" />
-                  </div>
-                  {/* Ngày xuất bản */}
-                  <p className="flex items-center gap-1 text-lightColor relative group hover:cursor-pointer hover:text-shop_dark_green hoverEffect">
-                    <Calendar size={15} /> {/* Biểu tượng Lịch */}
-                    {/* Định dạng ngày tháng (Ví dụ: Tháng 5 15, 2024) */}
-                    {dayjs(blog.publishedAt).format("MMMM D, YYYY")}
-                    {/* Hiệu ứng gạch chân khi hover */}
-                    <span className="absolute left-0 -bottom-1.5 bg-lightColor/30 inline-block w-full h-[2px] group-hover:bg-shop_dark_green hoverEffect" />
-                  </p>
+                <div className="relative overflow-hidden">
+                  <Image
+                    src={urlFor(blog.mainImage).width(600).height(400).url()}
+                    alt={blog.title}
+                    width={600}
+                    height={400}
+                    className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
-                {/* Tiêu đề bài viết và Liên kết */}
-                <Link
-                  href={`/blog/${blog.slug.current}`} // Đường dẫn chi tiết bài viết
-                  className="text-base font-bold tracking-wide mt-5 line-clamp-2 hover:text-shop_dark_green hoverEffect"
-                >
+              )}
+
+              {/* Nội dung */}
+              <div className="p-5">
+                {/* Danh mục + ngày tháng */}
+                <div className="flex items-center gap-4 text-xs mb-3 text-gray-500">
+                  {blog.blogcategories?.map((item, index) => (
+                    <span
+                      key={index}
+                      className="font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full"
+                    >
+                      {item.title}
+                    </span>
+                  ))}
+                  <span className="flex items-center gap-1">
+                    <Calendar size={14} />
+                    {dayjs(blog.publishedAt).format("DD/MM/YYYY")}
+                  </span>
+                </div>
+
+                {/* Tiêu đề */}
+                <h3 className="text-lg font-semibold text-gray-800 group-hover:text-emerald-600 line-clamp-2 transition-colors">
                   {blog.title}
-                </Link>
+                </h3>
+
+                {/* Nút đọc thêm */}
+                <div className="mt-4">
+                  <span className="inline-flex items-center text-sm font-medium text-emerald-600 group-hover:translate-x-1 transition-transform">
+                    Đọc thêm →
+                  </span>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </Container>
@@ -86,5 +94,4 @@ const BlogPage = async () => {
   );
 };
 
-// Xuất component
 export default BlogPage;
