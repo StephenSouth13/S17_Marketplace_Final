@@ -12,63 +12,54 @@ import AddToCartButton from "./AddToCartButton";
 
 /**
  * Hàm định dạng tiền tệ an toàn.
- * Trả về "N/A" nếu giá trị là null, undefined, hoặc không phải số.
+ * Trả về "Liên hệ" nếu giá trị không hợp lệ.
  */
 const formatVND = (price: number | null | undefined): string => {
-  // Kiểm tra nếu price là null, undefined, hoặc không phải là số hợp lệ
-  if (price === null || price === undefined || isNaN(price) || typeof price !== 'number') {
-    return "Liên hệ"; // Hoặc "N/A" tùy bạn
+  if (price === null || price === undefined || isNaN(price)) {
+    return "Liên hệ";
   }
-  return price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+  return price.toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
 };
 
 const ProductCard = ({ product }: { product: Product }) => {
-  
-  // SỬA LỖI 1: Đảm bảo price và discount luôn có giá trị số (mặc định là 0)
-  const price = product?.price ?? 0; 
-  const discount = product?.discount ?? 0;
-
-  const hasDiscount = discount > 0;
-  
-  // Tính toán finalPrice an toàn
-  const finalPrice = hasDiscount
-    ? price * (1 - discount / 100)
-    : price;
-
-  // Kiểm tra nếu sản phẩm bị thiếu dữ liệu quan trọng
   if (!product || !product.slug?.current) {
-      console.error("Lỗi: Dữ liệu sản phẩm không hợp lệ hoặc thiếu slug.");
-      return null; 
+    console.error("Lỗi: Dữ liệu sản phẩm không hợp lệ hoặc thiếu slug.");
+    return null;
   }
 
-  // --- LOGIC HIỂN THỊ ---
-  
+  const price = product?.price ?? 0;
+  const discount = product?.discount ?? 0;
+  const hasDiscount = discount > 0;
+  const finalPrice = hasDiscount ? price * (1 - discount / 100) : price;
+
   return (
-    <div className="text-sm border rounded-xl border-gray-200 group bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+    <div className="text-sm border rounded-2xl border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden group">
       <div className="relative overflow-hidden bg-gray-50">
-        
-        {/* KIỂM TRA ẢNH: Đảm bảo có ảnh trước khi render */}
+        {/* Ảnh sản phẩm */}
         {product?.images?.[0] && (
           <Link href={`/product/${product.slug.current}`}>
             <Image
               src={urlFor(product.images[0]).url()}
-              alt={product?.name || "product"}
+              alt={product?.name ?? "Sản phẩm S17"}
               width={500}
               height={500}
-              priority
-              className={`w-full h-64 object-contain p-4 transition-transform duration-500 
-              ${
+              loading="lazy"
+              className={`w-full h-64 object-contain p-4 transition-transform duration-500 ${
                 product?.stock !== 0
                   ? "group-hover:scale-105"
-                  : "opacity-50 grayscale"
+                  : "opacity-60 grayscale"
               }`}
             />
           </Link>
         )}
 
+        {/* Menu góc phải (so sánh / yêu thích / xem nhanh) */}
         <ProductSideMenu product={product} />
 
-        {/* LOGIC TRẠNG THÁI */}
+        {/* Nhãn trạng thái */}
         {product?.status === "sale" ? (
           <p className="absolute top-2 left-2 z-10 text-xs font-semibold bg-gradient-to-r from-red-500 to-orange-500 text-white px-2 py-0.5 rounded-full shadow-md">
             Giảm giá
@@ -76,34 +67,32 @@ const ProductCard = ({ product }: { product: Product }) => {
         ) : (
           <Link
             href={"/deal"}
-            className="absolute top-2 left-2 z-10 bg-orange-100 p-1.5 rounded-full"
+            className="absolute top-2 left-2 z-10 bg-orange-100 p-1.5 rounded-full hover:scale-110 transition-transform"
           >
-            <Flame
-              size={18}
-              fill="#fb6c08"
-              className="text-orange-500 group-hover:scale-110 transition-transform"
-            />
+            <Flame size={18} fill="#fb6c08" className="text-orange-500" />
           </Link>
         )}
       </div>
 
-      <div className="p-3 flex flex-col gap-2">
-        {/* HIỂN THỊ DANH MỤC */}
-        {product?.categories && (
+      {/* Nội dung sản phẩm */}
+      <div className="p-4 flex flex-col gap-2">
+        {/* Danh mục */}
+        {product?.categories && product.categories.length > 0 && (
           <p className="uppercase text-xs font-medium text-gray-500 line-clamp-1">
-            {product.categories.map((cat) => cat).join(", ")}
+            {product.categories.join(", ")}
           </p>
         )}
 
+        {/* Tên sản phẩm */}
         <Title className="text-base font-semibold line-clamp-2 group-hover:text-shop_dark_green transition-colors">
-          {product?.name || "Sản phẩm không tên"}
+          {product?.name ?? "Sản phẩm không tên"}
         </Title>
 
-        {/* ĐÁNH GIÁ (Fixed 4 sao) */}
+        {/* Đánh giá */}
         <div className="flex items-center gap-1">
-          {[...Array(5)].map((_, index) => (
+          {Array.from({ length: 5 }).map((_, index) => (
             <StarIcon
-              key={index}
+              key={`star-${index}`}
               className={`w-4 h-4 ${
                 index < 4 ? "text-yellow-400" : "text-gray-300"
               }`}
@@ -113,17 +102,17 @@ const ProductCard = ({ product }: { product: Product }) => {
           <p className="text-xs text-gray-500 ml-1">(5 đánh giá)</p>
         </div>
 
+        {/* Giá và kho */}
         <div className="flex items-center justify-between mt-2">
-          {/* HIỂN THỊ GIÁ AN TOÀN */}
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <p className="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-400 bg-clip-text text-transparent">
                 {formatVND(finalPrice)}
               </p>
               {hasDiscount && (
-                <p className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-md font-semibold">
+                <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-md font-semibold">
                   -{discount}%
-                </p>
+                </span>
               )}
             </div>
 
@@ -134,7 +123,6 @@ const ProductCard = ({ product }: { product: Product }) => {
             )}
           </div>
 
-          {/* HIỂN THỊ TỒN KHO */}
           <p
             className={`text-xs font-medium ${
               product?.stock === 0
@@ -142,11 +130,13 @@ const ProductCard = ({ product }: { product: Product }) => {
                 : "text-green-600 font-semibold"
             }`}
           >
-            {product?.stock === 0 ? "Hết hàng" : `Còn ${product?.stock ?? 0} sp`}
+            {product?.stock === 0
+              ? "Hết hàng"
+              : `Còn ${product?.stock ?? 0} SP`}
           </p>
         </div>
 
-        {/* NÚT THÊM VÀO GIỎ */}
+        {/* Nút thêm vào giỏ */}
         <AddToCartButton
           product={product}
           className="w-full mt-3 rounded-full bg-gradient-to-r from-shop_dark_green to-green-500 text-white hover:opacity-90 transition-all font-semibold"
