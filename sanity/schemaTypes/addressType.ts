@@ -3,90 +3,100 @@ import { defineField, defineType } from "sanity";
 
 export const addressType = defineType({
   name: "address",
-  title: "Addresses",
+  title: "Địa chỉ người dùng",
   type: "document",
   icon: HomeIcon,
   fields: [
     defineField({
-      name: "name",
-      title: "Address Name",
+      name: "userId",
+      title: "User ID",
       type: "string",
-      description: "A friendly name for this address (e.g. Home, Work)",
-      validation: (Rule) => Rule.required().max(50),
+      description: "ID người dùng (Clerk hoặc auth system)",
+      validation: (Rule) => Rule.required().error("Thiếu userId"),
     }),
     defineField({
-      name: "email",
-      title: "User Email",
-      type: "email",
+      name: "fullName",
+      title: "Họ và tên người nhận",
+      type: "string",
+      validation: (Rule) => Rule.required().min(3).error("Tên không hợp lệ"),
     }),
     defineField({
-      name: "address",
-      title: "Street Address",
+      name: "phone",
+      title: "Số điện thoại",
       type: "string",
-      description: "The street address including apartment/unit number",
-      validation: (Rule) => Rule.required().min(5).max(100),
+      validation: (Rule) =>
+        Rule.required()
+          .regex(/^(0|\+84)[0-9]{9}$/, {
+            name: "phone",
+            invert: false,
+          })
+          .error("Số điện thoại không hợp lệ"),
+    }),
+    defineField({
+      name: "street",
+      title: "Địa chỉ chi tiết (số nhà, đường)",
+      type: "string",
+      validation: (Rule) => Rule.required().min(5).error("Vui lòng nhập địa chỉ chi tiết"),
+    }),
+    defineField({
+      name: "district",
+      title: "Quận/Huyện",
+      type: "string",
+      validation: (Rule) => Rule.required().error("Vui lòng nhập Quận/Huyện"),
     }),
     defineField({
       name: "city",
-      title: "City",
+      title: "Tỉnh/Thành phố",
       type: "string",
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error("Vui lòng nhập Tỉnh/Thành phố"),
     }),
     defineField({
-      name: "state",
-      title: "State",
+      name: "type",
+      title: "Loại địa chỉ",
       type: "string",
-      description: "Two letter state code (e.g. NY, CA)",
-      validation: (Rule) => Rule.required().length(2).uppercase(),
+      options: {
+        list: [
+          { title: "Nhà riêng", value: "home" },
+          { title: "Văn phòng", value: "office" },
+          { title: "Khác", value: "other" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "home",
     }),
     defineField({
-      name: "zip",
-      title: "ZIP Code",
-      type: "string",
-      description: "Format: 12345 or 12345-6789",
-      validation: (Rule) =>
-        Rule.required()
-          .regex(/^\d{5}(-\d{4})?$/, {
-            name: "zipCode",
-            invert: false,
-          })
-          .custom((zip: string | undefined) => {
-            if (!zip) {
-              return "ZIP code is required";
-            }
-            if (!zip.match(/^\d{5}(-\d{4})?$/)) {
-              return "Please enter a valid ZIP code (e.g. 12345 or 12345-6789)";
-            }
-            return true;
-          }),
-    }),
-    defineField({
-      name: "default",
-      title: "Default Address",
+      name: "isDefault",
+      title: "Đặt làm địa chỉ mặc định",
       type: "boolean",
-      description: "Is this the default shipping address?",
       initialValue: false,
     }),
-
     defineField({
       name: "createdAt",
-      title: "Created At",
+      title: "Ngày tạo",
       type: "datetime",
       initialValue: () => new Date().toISOString(),
+      readOnly: true,
     }),
   ],
   preview: {
     select: {
-      title: "name",
-      subtitle: "address",
+      title: "fullName",
+      subtitle: "street",
       city: "city",
-      state: "state",
-      isDefault: "default",
+      district: "district",
+      type: "type",
+      isDefault: "isDefault",
     },
-    prepare({ title, subtitle, city, state, isDefault }) {
+    prepare({ title, subtitle, city, district, type, isDefault }) {
+      const typeMap: Record<string, string> = {
+        home: "🏠 Nhà riêng",
+        office: "💼 Văn phòng",
+        other: "📦 Khác",
+      };
+
       return {
-        title: `${title} ${isDefault ? "(Default)" : ""}`,
-        subtitle: `${subtitle}, ${city}, ${state}`,
+        title: `${title} ${isDefault ? "⭐ [Mặc định]" : ""}`,
+        subtitle: `${subtitle}, ${district}, ${city} — ${typeMap[type] || ""}`,
       };
     },
   },

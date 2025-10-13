@@ -35,33 +35,36 @@ const ProductSideMenu = ({
   }, [product, favoriteProduct]); // Chạy lại khi 'product' hoặc 'favoriteProduct' thay đổi
   
   // Hàm xử lý khi nhấn vào biểu tượng yêu thích
-  const handleFavorite = (e: React.MouseEvent<HTMLSpanElement>) => {
+  const handleFavorite = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault(); // Ngăn chặn hành vi mặc định
+    // Dừng propagation để không ảnh hưởng đến các sự kiện click khác (nếu có)
+    e.stopPropagation(); 
     if (product?._id) { // Đảm bảo sản phẩm có ID
       // Thêm/Xóa sản phẩm khỏi danh sách yêu thích và hiển thị thông báo
       addToFavorite(product).then(() => {
         toast.success(
           existingProduct
-            ? "Đã xóa sản phẩm thành công!" // Thông báo khi sản phẩm đã được xóa
-            : "Đã thêm sản phẩm thành công!" // Thông báo khi sản phẩm đã được thêm
+            ? "Đã xóa sản phẩm khỏi danh sách yêu thích!" // Thông báo khi sản phẩm đã được xóa
+            : "Đã thêm sản phẩm vào danh sách yêu thích!" // Thông báo khi sản phẩm đã được thêm
         );
       });
     }
   };
 
   // Trả về JSX để hiển thị
+  // QUAN TRỌNG: Đã loại bỏ 'absolute top-2 right-2' và chỉ giữ lại 1 div để TooltipTrigger nhận.
   return (
     <div
-      // Kết hợp các tên lớp: vị trí tuyệt đối, góc trên bên phải, con trỏ hover
-      className={cn("absolute top-2 right-2 hover:cursor-pointer", className)}
+      onClick={handleFavorite} // Gắn hàm xử lý sự kiện
+      // Thay đổi `hover:cursor-pointer` bằng `cursor-pointer`
+      className={cn(
+        `p-2.5 rounded-full cursor-pointer transition-colors duration-200 
+         hover:bg-shop_dark_green/80 hover:text-white`,
+        existingProduct ? "bg-shop_dark_green/80 text-white" : "bg-lightColor/10 text-gray-500",
+        className
+      )}
     >
-      <div
-        onClick={handleFavorite} // Gắn hàm xử lý sự kiện
-        // Định kiểu động dựa trên việc sản phẩm đã có trong danh sách yêu thích hay chưa
-        className={`p-2.5 rounded-full hover:bg-shop_dark_green/80 hover:text-white hoverEffect  ${existingProduct ? "bg-shop_dark_green/80 text-white" : "bg-lightColor/10"}`}
-      >
-        <Heart size={15} /> {/* Biểu tượng trái tim */}
-      </div>
+      <Heart size={15} /> {/* Biểu tượng trái tim */}
     </div>
   );
 };
