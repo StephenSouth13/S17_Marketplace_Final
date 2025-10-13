@@ -7,8 +7,23 @@ import Title from "./Title";
 import { getLatestBlogs } from "@/sanity/queries";
 import { urlFor } from "@/sanity/lib/image";
 
+// ✅ Định nghĩa type rõ ràng cho Blog và Category
+interface BlogCategory {
+  title: string;
+}
+
+interface Blog {
+  _id: string;
+  title: string;
+  slug?: { current: string };
+  excerpt?: string;
+  mainImage?: any;
+  blogcategories?: BlogCategory[];
+  publishedAt?: string;
+}
+
 const LatestBlog = async () => {
-  const blogs = await getLatestBlogs();
+  const blogs: Blog[] = await getLatestBlogs();
 
   if (!blogs?.length) return null;
 
@@ -30,14 +45,14 @@ const LatestBlog = async () => {
 
         {/* Grid hiển thị blog */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {blogs.map((blog) => (
+          {blogs.map((blog: Blog) => (
             <div
               key={blog._id}
               className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
             >
               {/* Ảnh chính */}
               {blog.mainImage && (
-                <Link href={`/blog/${blog.slug?.current}`}>
+                <Link href={`/blog/${blog.slug?.current || "#"}`}>
                   <div className="relative w-full h-56 overflow-hidden">
                     <Image
                       src={urlFor(blog.mainImage).url()}
@@ -55,7 +70,7 @@ const LatestBlog = async () => {
               <div className="flex flex-col flex-grow p-5">
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
                   <div className="flex flex-wrap gap-2">
-                    {blog.blogcategories?.map((cat, i) => (
+                    {blog.blogcategories?.map((cat: BlogCategory, i: number) => (
                       <span
                         key={i}
                         className="bg-green-50 text-green-600 px-2 py-0.5 rounded-md font-medium"
@@ -67,12 +82,14 @@ const LatestBlog = async () => {
 
                   <div className="flex items-center gap-1 text-gray-400">
                     <Calendar size={14} className="text-green-600" />
-                    {dayjs(blog.publishedAt).format("DD/MM/YYYY")}
+                    {blog.publishedAt
+                      ? dayjs(blog.publishedAt).format("DD/MM/YYYY")
+                      : "Chưa cập nhật"}
                   </div>
                 </div>
 
                 <Link
-                  href={`/blog/${blog.slug?.current}`}
+                  href={`/blog/${blog.slug?.current || "#"}`}
                   className="text-base md:text-lg font-semibold text-gray-800 hover:text-green-600 transition-colors line-clamp-2"
                 >
                   {blog.title}
@@ -84,7 +101,7 @@ const LatestBlog = async () => {
 
                 <div className="mt-auto pt-4">
                   <Link
-                    href={`/blog/${blog.slug?.current}`}
+                    href={`/blog/${blog.slug?.current || "#"}`}
                     className="inline-flex items-center text-sm font-semibold text-green-600 hover:text-green-700 transition-all"
                   >
                     Đọc thêm
