@@ -1,4 +1,4 @@
-//components/Header.tsx
+// components/Header.tsx
 import React from "react";
 import Container from "./Container";
 import Logo from "./Logo";
@@ -17,7 +17,10 @@ import { getMyOrders } from "@/sanity/queries";
 const Header = async () => {
   const user = await currentUser();
   const { userId } = await auth();
-  const orders = userId ? await getMyOrders(userId) : [];
+  
+  // FIX: Sử dụng toán tử ?? [] để đảm bảo orders luôn là một mảng, 
+  // ngay cả khi getMyOrders trả về null hoặc undefined.
+  const orders = userId ? (await getMyOrders(userId)) ?? [] : [];
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-all duration-300">
@@ -47,7 +50,8 @@ const Header = async () => {
               className="relative group text-gray-700 hover:text-emerald-600 transition-colors duration-200"
             >
               <Logs className="w-5 h-5" />
-              {orders?.length > 0 && (
+              {/* Sửa lỗi: Đã bỏ toán tử ?. vì orders chắc chắn là một mảng sau khi fix */}
+              {orders.length > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-emerald-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-sm">
                   {orders.length}
                 </span>
