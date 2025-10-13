@@ -1,180 +1,158 @@
 "use client";
 
-import React, { Suspense, useEffect, useState, useMemo, useCallback } from "react";
-// Loại bỏ các imports bị lỗi và thay thế bằng định nghĩa tích hợp bên dưới
+import { Suspense, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Check, Home, Package, ShoppingBag, Truck, Zap } from "lucide-react"; 
+import { CheckCircle2, Home, Package, ShoppingBag, Truck, Sparkles } from "lucide-react";
+import Link from "next/link";
+import useStore from "@/store";
+import { useAuth } from "@clerk/nextjs";
 
-// --- Tích hợp các hàm giả lập để component có thể chạy độc lập ---
-
-// Định nghĩa kiểu cho CustomLink props (thay thế next/link)
-// Sử dụng React.ComponentProps<'a'> để có kiểu dữ liệu chính xác cho thẻ <a>
-const CustomLink = (props: React.ComponentProps<'a'>) => <a {...props} />;
-
-// 2. Giả lập useSearchParams (thay thế next/navigation)
-// Hàm này sẽ giả lập việc lấy orderNumber từ URL query.
-const useMockSearchParams = () => {
-    // Trả về một giá trị giả lập hoặc giá trị từ URL thật nếu có thể
-    const [mockOrderNumber] = useState("S17-A9B4-2024");
-    
-    // Giả lập logic lấy giá trị từ URL
-    // Thêm định nghĩa kiểu rõ ràng cho key là 'string'
-    const get = useCallback((key: string): string | null => {
-        if (key === 'orderNumber') {
-            // Trong môi trường độc lập, chúng ta dùng giá trị mock
-            return mockOrderNumber;
-        }
-        return null;
-    }, [mockOrderNumber]);
-
-    // Giả định là useSearchParams, chỉ cần trả về object có hàm get
-    return { get };
-};
-
-// 3. Giả lập useStore (thay thế @/store)
-// Tạo một store tối thiểu chỉ chứa hàm resetCart giả lập
-const useMockStore = () => {
-    const resetCart = () => {
-        console.log("Mock: Giỏ hàng đã được reset.");
-        // Có thể thêm logic state local nếu cần
-    };
-    return { resetCart };
-};
-
-
-/**
- * Component chính chứa logic và giao diện
- */
 const SuccessPageContent = () => {
-  // Thay thế bằng hàm giả lập
-  const { resetCart } = useMockStore(); 
-  const searchParams = useMockSearchParams(); 
-  
-  // Lấy query param từ URL (sử dụng hàm giả lập)
+  const { resetCart } = useStore();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
+
   const orderNumber = searchParams.get("orderNumber");
 
-  // Reset giỏ hàng sau khi đặt hàng thành công
   useEffect(() => {
-    if (orderNumber) {
-      // Thực thi hàm resetCart giả lập
-      resetCart(); 
-      console.log(`Đã xác nhận đơn hàng #${orderNumber}. Giỏ hàng được reset.`);
+    if (!isSignedIn) {
+      router.push("/sign-in");
+      return;
     }
-  }, [orderNumber, resetCart]);
+    if (orderNumber) {
+      resetCart();
+      console.log(`✅ Giỏ hàng đã được reset sau đơn #${orderNumber}`);
+    }
+  }, [orderNumber, resetCart, router, isSignedIn]);
 
   return (
-    // Nền: Gradient tinh tế từ màu đá (stone) sang ngọc bích (emerald) nhẹ
-    <div className="py-12 px-4 min-h-screen bg-gradient-to-br from-stone-50 via-white to-emerald-50 flex items-center justify-center font-sans">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-100 py-12 px-4 font-sans">
       <motion.div
-        // Animation xuất hiện mượt mà
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, ease: "easeInOut" }}
-        className="bg-white border-t-8 border-emerald-500 rounded-3xl shadow-2xl p-6 md:p-12 max-w-xl w-full text-center relative overflow-hidden"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative bg-white/80 backdrop-blur-xl border border-emerald-100 rounded-3xl shadow-2xl p-8 md:p-12 max-w-2xl w-full text-center overflow-hidden"
       >
-        
-        {/* Vùng Icon Xác nhận Cao Cấp */}
+        {/* Hiệu ứng ánh sáng nền */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.15 }}
+          transition={{ duration: 2 }}
+          className="absolute inset-0 bg-gradient-to-tr from-emerald-100 via-yellow-50 to-white blur-3xl"
+        />
+
+        {/* Icon xác nhận */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 150, damping: 10 }}
-          className="relative w-24 h-24 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl shadow-emerald-200/50"
+          transition={{ delay: 0.3, type: "spring", stiffness: 120, damping: 12 }}
+          className="relative w-24 h-24 mx-auto mb-8 flex items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-300/40"
         >
-          {/* Icon Checkmark */}
-          <Check className="text-white w-12 h-12" strokeWidth={3} />
-          {/* Hiệu ứng tia sáng nhỏ màu vàng */}
+          <CheckCircle2 className="w-12 h-12 text-white" strokeWidth={2.5} />
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1, repeat: Infinity, repeatType: "reverse" }}
-            className="absolute top-0 right-0 text-amber-300 transform rotate-12"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              delay: 0.8,
+              repeat: Infinity,
+              repeatType: "reverse",
+              duration: 1.2,
+            }}
+            className="absolute top-0 right-0 text-yellow-300"
           >
-            <Zap className="w-5 h-5 fill-amber-300" />
+            <Sparkles className="w-5 h-5" />
           </motion.div>
         </motion.div>
 
-        {/* Tiêu đề & Thông điệp */}
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
-          Hoàn Thành Đơn Hàng
+        {/* Tiêu đề */}
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-3">
+          Thanh Toán Thành Công
         </h1>
-        <p className="text-gray-600 text-lg leading-relaxed mb-6">
-          <span className="font-bold text-emerald-700">Xin chân thành cảm ơn!</span> Đơn hàng của bạn đã được tiếp nhận thành công.
+        <p className="text-gray-600 text-lg mb-8">
+          Cảm ơn bạn đã tin tưởng! Đơn hàng của bạn đã được ghi nhận và sẽ được xử lý ngay.
         </p>
 
-        {/* Thông tin Mã đơn hàng (được làm nổi bật) */}
+        {/* Mã đơn hàng */}
         {orderNumber && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="bg-emerald-50 border-l-4 border-emerald-500 p-4 mb-8 rounded-lg text-left shadow-inner"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100 rounded-xl p-5 mb-8 shadow-inner"
           >
-            <p className="text-sm font-semibold text-emerald-800">
-              MÃ ĐƠN HÀNG CỦA BẠN:
+            <p className="text-sm text-gray-700 font-medium mb-1">
+              Mã đơn hàng của bạn:
             </p>
-            <p className="text-2xl font-extrabold text-emerald-600 tracking-wider">
-              {orderNumber}
+            <p className="text-2xl font-bold tracking-wider text-emerald-700">
+              #{orderNumber}
             </p>
           </motion.div>
         )}
-        
-        {/* Thông báo giao hàng */}
-        <div className="flex items-center justify-center p-4 bg-yellow-50 border border-yellow-200 rounded-xl mb-8">
-            <Truck className="w-6 h-6 text-amber-500 mr-3" />
-            <p className="text-sm text-gray-700 font-medium">
-                Chúng tôi sẽ tiến hành **Giao Hàng Nhanh** trong vòng **24h** tới.
-            </p>
-        </div>
 
-        {/* Nút điều hướng Grid 3 cột */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            
-            {/* Về Trang Chủ */}
-            <CustomLink
-                href="/"
-                className="flex items-center justify-center px-4 py-3 font-semibold bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all duration-300 shadow-lg shadow-emerald-200"
-            >
-                <Home className="w-5 h-5 mr-2" />
-                Trang Chủ
-            </CustomLink>
-            
-            {/* Xem Đơn Hàng */}
-            <CustomLink
-                href="/orders"
-                className="flex items-center justify-center px-4 py-3 font-semibold bg-white text-emerald-700 border border-emerald-400 rounded-xl hover:bg-emerald-50 transition-all duration-300 shadow-md"
-            >
-                <Package className="w-5 h-5 mr-2" />
-                Theo Dõi Đơn
-            </CustomLink>
-            
-            {/* Tiếp Tục Mua Sắm */}
-            <CustomLink
-                href="/shop"
-                className="flex items-center justify-center px-4 py-3 font-semibold bg-amber-400 text-gray-800 rounded-xl hover:bg-amber-500 transition-all duration-300 shadow-lg shadow-amber-100"
-            >
-                <ShoppingBag className="w-5 h-5 mr-2" />
-                Mua Tiếp
-            </CustomLink>
-        </div>
+        {/* Trạng thái giao hàng */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex items-center justify-center bg-amber-50 border border-amber-200 text-amber-700 py-3 px-5 rounded-xl mb-8 shadow-sm"
+        >
+          <Truck className="w-5 h-5 mr-3 text-amber-500" />
+          <span className="font-medium">
+            Giao hàng nhanh trong <b>24h</b> – Vui lòng giữ liên lạc!
+          </span>
+        </motion.div>
+
+        {/* Nút điều hướng */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        >
+          {/* Trang chủ */}
+          <Link
+            href="/"
+            className="flex items-center justify-center py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition"
+          >
+            <Home className="w-5 h-5 mr-2" />
+            Trang Chủ
+          </Link>
+
+          {/* Xem đơn hàng */}
+          <Link
+            href="/orders"
+            className="flex items-center justify-center py-3 rounded-xl border border-emerald-400 bg-white text-emerald-700 font-semibold hover:bg-emerald-50 transition hover:scale-[1.02]"
+          >
+            <Package className="w-5 h-5 mr-2" />
+            Theo Dõi Đơn
+          </Link>
+
+          {/* Mua thêm */}
+          <Link
+            href="/shop"
+            className="flex items-center justify-center py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-gray-800 font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition"
+          >
+            <ShoppingBag className="w-5 h-5 mr-2" />
+            Mua Thêm
+          </Link>
+        </motion.div>
       </motion.div>
     </div>
   );
 };
 
-/**
- * Component bọc ngoài để xử lý Suspense
- */
-const SuccessPage = () => {
-  // Bọc SuccessPageContent trong Suspense vì nó phụ thuộc vào các hooks
-  return (
-    <Suspense fallback={
-      <div className="py-12 px-4 min-h-screen bg-gradient-to-br from-stone-50 via-white to-emerald-50 flex items-center justify-center">
-        <div className="text-lg font-medium text-gray-600">Đang tải trang xác nhận...</div>
+const SuccessPage = () => (
+  <Suspense
+    fallback={
+      <div className="min-h-screen flex items-center justify-center text-gray-600 text-lg bg-gradient-to-br from-emerald-50 via-white to-emerald-100">
+        Đang tải trang xác nhận...
       </div>
-    }>
-      <SuccessPageContent />
-    </Suspense>
-  );
-};
+    }
+  >
+    <SuccessPageContent />
+  </Suspense>
+);
 
 export default SuccessPage;
