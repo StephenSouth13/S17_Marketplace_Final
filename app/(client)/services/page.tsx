@@ -1,3 +1,4 @@
+// app/(client)/services/page.tsx
 import { client } from "@/sanity/lib/client";
 import { ServicesGrid } from "@/components/ServicesGrid";
 
