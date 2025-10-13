@@ -81,21 +81,21 @@ export const productType = defineType({
       },
     }),
     defineField({
-      name: "variant",
-      title: "Phân loại Sản phẩm (Type)", // Đổi tên rõ ràng hơn trong bối cảnh S17
-      type: "string",
-      options: {
-        list: [
-          // 🚨 Luôn giữ 'value' bằng tiếng Anh không dấu cho logic backend
-          { title: "Thực phẩm", value: "food" },
-          { title: "Đồ uống", value: "drink" },
-          { title: "Dịch vụ", value: "service" },
-          { title: "Khác", value: "others" },
-        ],
-        layout: "radio", // Hiển thị dưới dạng radio
-      },
-      validation: (Rule) => Rule.required(), // Bắt buộc chọn loại sản phẩm
-    }),
+  name: "variant",
+  title: "Phân loại sản phẩm",
+  type: "string",
+  options: {
+    list: [
+      { title: "Tất cả", value: "all" },
+      { title: "Thực phẩm", value: "food" },
+      { title: "Nước uống", value: "drink" },
+      { title: "Khác", value: "others" },
+    ],
+    layout: "radio",
+  },
+  validation: (Rule) => Rule.required(),
+}),
+
     defineField({
       name: "isFeatured",
       title: "Sản phẩm Nổi bật (Trang chủ)", // Tiêu đề tiếng Việt

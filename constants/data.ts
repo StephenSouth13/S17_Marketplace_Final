@@ -29,8 +29,9 @@ export const categoriesData = [
 ];
 
 export const productType = [
+  { title: "Tất cả", value: "all" },
   { title: "Thực phẩm", value: "food" },
-  { title: "Đồ uống", value: "drink" },
-  { title: "Dịch vụ", value: "service" },
+  { title: "Nước uống", value: "drink" },
   { title: "Khác", value: "others" },
 ];
+
