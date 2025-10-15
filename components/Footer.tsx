@@ -57,7 +57,7 @@ const Footer = () => {
           <div className="space-y-5">
             <Logo />
             <SubText className="text-gray-600 leading-relaxed text-sm">
-              Nền tảng thương mại & đầu tư hàng đầu — mang đến sản phẩm chất
+              Nền tảng thương mại & đầu tư— mang đến sản phẩm chất
               lượng cao và cơ hội đầu tư bền vững.
             </SubText>
 

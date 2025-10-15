@@ -21,7 +21,7 @@ export function PartnersSection() {
             Hệ thống các công ty thành viên
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-base md:text-lg">
-            Chúng tôi tự hào hợp tác cùng những tổ chức tài chính và doanh nghiệp hàng đầu Việt Nam
+            Chúng tôi tự hào hợp tác cùng những tổ chức tài chính và doanh nghiệp Việt Nam
           </p>
         </div>
 
