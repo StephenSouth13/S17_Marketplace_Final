@@ -15,15 +15,7 @@ export function PartnersSection() {
   return (
     <div className="py-12">
       <div className="container mx-auto px-6">
-        {/* Header */}
-        <div className="text-center space-y-3 mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
-            Hệ thống các công ty thành viên
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-base md:text-lg">
-            Chúng tôi tự hào hợp tác cùng những tổ chức tài chính và doanh nghiệp Việt Nam
-          </p>
-        </div>
+        
 
         {/* Grid logo */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center justify-items-center">
