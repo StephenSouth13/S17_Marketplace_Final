@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import ProductCard from "./ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { client } from "@/sanity/lib/client";
-import NoProductAvailable from "./NoProductAvailable";
 import { Loader2 } from "lucide-react";
-import Container from "./Container";
-import HomeTabbar from "./HomeTabbar";
+import { client } from "@/sanity/lib/client";
 import { productType } from "@/constants/data";
 import { Product } from "@/sanity.types";
+import Container from "./Container";
+import HomeTabbar from "./HomeTabbar";
+import ProductCard from "./ProductCard";
+import NoProductAvailable from "./NoProductAvailable";
 
 const ProductGrid = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -20,78 +20,66 @@ const ProductGrid = () => {
     productType.find((p) => p.title === productType[0]?.title)?.value || "all"
   );
 
-  // Đảm bảo component chỉ fetch sau khi mount
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // Bảo đảm chỉ fetch khi đã mount client
+  useEffect(() => setIsClient(true), []);
 
-  // Cập nhật giá trị variantValue khi tab thay đổi
+  // Cập nhật variant khi tab đổi
   useEffect(() => {
     const newValue =
       productType.find((p) => p.title === selectedTab)?.value || "all";
     setVariantValue(newValue);
   }, [selectedTab]);
 
-  // Fetch sản phẩm khi variantValue thay đổi
+  // Fetch sản phẩm từ Sanity
   useEffect(() => {
     if (!isClient) return;
-
     const fetchData = async () => {
       setLoading(true);
       try {
-        let response;
+        let query =
+          variantValue === "all"
+            ? `*[_type == "product"] | order(_createdAt desc){..., "categories": categories[]->title}`
+            : `*[_type == "product" && variant == $variant] | order(_createdAt desc){..., "categories": categories[]->title}`;
 
-        if (variantValue === "all") {
-          // 👉 Hiển thị toàn bộ sản phẩm khi chọn "Tất cả"
-          response = await client.fetch(
-            `*[_type == "product"] | order(name asc){
-              ...,
-              "categories": categories[]->title
-            }`
-          );
-        } else {
-          // 👉 Lọc sản phẩm theo loại (food, drink, others)
-          response = await client.fetch(
-            `*[_type == "product" && variant == $variant] | order(name asc){
-              ...,
-              "categories": categories[]->title
-            }`,
-            { variant: variantValue }
-          );
-        }
-
-        setProducts(response);
-      } catch (error) {
-        console.error("LỖI TẢI SẢN PHẨM:", error);
+        const res =
+          variantValue === "all"
+            ? await client.fetch(query)
+            : await client.fetch(query, { variant: variantValue });
+        setProducts(res);
+      } catch (err) {
+        console.error("❌ LỖI TẢI SẢN PHẨM:", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [variantValue, isClient]);
 
-  if (!isClient) {
+  // Loader
+  if (!isClient)
     return (
-      <Container className="flex flex-col lg:px-0 my-10">
+      <Container className="flex flex-col my-10">
         <HomeTabbar selectedTab={selectedTab} onTabSelect={setSelectedTab} />
-        <div className="flex flex-col items-center justify-center py-10 min-h-80 space-y-4 text-center bg-gray-100 rounded-lg w-full mt-10">
-          <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
-          <span>Đang chuẩn bị nội dung...</span>
+        <div className="flex flex-col items-center justify-center py-10 min-h-80 space-y-4 bg-gray-50 rounded-xl mt-8 shadow-inner">
+          <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+          <span className="text-sm text-gray-500">Đang chuẩn bị nội dung...</span>
         </div>
       </Container>
     );
-  }
 
   return (
-    <Container className="flex flex-col lg:px-0 my-10">
+    <Container className="flex flex-col my-10">
       <HomeTabbar selectedTab={selectedTab} onTabSelect={setSelectedTab} />
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-10 min-h-80 space-y-4 text-center bg-gray-100 rounded-lg w-full mt-10">
-          <motion.div className="flex items-center space-x-2 text-blue-600">
+        <div className="flex flex-col items-center justify-center py-10 min-h-80 space-y-4 bg-gray-50 rounded-xl mt-8 shadow-inner">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center space-x-2 text-green-600"
+          >
             <Loader2 className="w-5 h-5 animate-spin" />
-            <span>Sản phẩm đang tải...</span>
+            <span className="font-medium">Đang tải sản phẩm...</span>
           </motion.div>
         </div>
       ) : products?.length ? (
@@ -101,11 +89,15 @@ const ProductGrid = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 mt-10"
+            transition={{ duration: 0.25 }}
+            className="
+              grid
+              grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5
+              gap-3 sm:gap-4 md:gap-5 mt-8
+            "
           >
             {products.map((product) => (
-              <ProductCard key={product?._id} product={product} />
+              <ProductCard key={product._id} product={product} />
             ))}
           </motion.div>
         </AnimatePresence>

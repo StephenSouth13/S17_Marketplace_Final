@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 interface Props {
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }
 const Title = ({ children, className }: Props) => {
   return (

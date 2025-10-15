@@ -1,8 +1,8 @@
-// components/ProductCard.tsx
+"use client";
+
 import { Product } from "@/sanity.types";
 import { urlFor } from "@/sanity/lib/image";
 import Image from "next/image";
-import React from "react";
 import Link from "next/link";
 import { StarIcon } from "@sanity/icons";
 import { Flame } from "lucide-react";
@@ -10,25 +10,14 @@ import Title from "./Title";
 import ProductSideMenu from "./ProductSideMenu";
 import AddToCartButton from "./AddToCartButton";
 
-/**
- * Hàm định dạng tiền tệ an toàn.
- * Trả về "Liên hệ" nếu giá trị không hợp lệ.
- */
+// Format tiền tệ
 const formatVND = (price: number | null | undefined): string => {
-  if (price === null || price === undefined || isNaN(price)) {
-    return "Liên hệ";
-  }
-  return price.toLocaleString("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  });
+  if (price === null || price === undefined || isNaN(price)) return "Liên hệ";
+  return price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 };
 
 const ProductCard = ({ product }: { product: Product }) => {
-  if (!product || !product.slug?.current) {
-    console.error("Lỗi: Dữ liệu sản phẩm không hợp lệ hoặc thiếu slug.");
-    return null;
-  }
+  if (!product || !product.slug?.current) return null;
 
   const price = product?.price ?? 0;
   const discount = product?.discount ?? 0;
@@ -36,111 +25,123 @@ const ProductCard = ({ product }: { product: Product }) => {
   const finalPrice = hasDiscount ? price * (1 - discount / 100) : price;
 
   return (
-    <div className="text-sm border rounded-2xl border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden group">
-      <div className="relative overflow-hidden bg-gray-50">
-        {/* Ảnh sản phẩm */}
-        {product?.images?.[0] && (
-          <Link href={`/product/${product.slug.current}`}>
+    <div
+      className="
+        group flex flex-col justify-between
+        border border-gray-200 rounded-2xl bg-white shadow-sm
+        hover:shadow-md transition-all duration-300 overflow-hidden
+      "
+    >
+      {/* Ảnh sản phẩm */}
+      <div className="relative bg-gray-50 w-full h-52 sm:h-60 flex items-center justify-center">
+        {product?.images && product.images[0] ? (
+          <Link href={`/product/${product.slug.current}`} className="w-full h-full">
             <Image
-              src={urlFor(product.images[0]).url()}
-              alt={product?.name ?? "Sản phẩm S17"}
+              src={
+                product.images[0]
+                  ? urlFor(product.images[0]).url()
+                  : "/no-image.png"
+              }
+              alt={product?.name ?? "Sản phẩm"}
               width={500}
               height={500}
-              loading="lazy"
-              className={`w-full h-64 object-contain p-4 transition-transform duration-500 ${
-                product?.stock !== 0
-                  ? "group-hover:scale-105"
-                  : "opacity-60 grayscale"
-              }`}
+              className={`w-full h-full object-contain p-4 transition-transform duration-300 
+                ${product?.stock !== 0 ? "group-hover:scale-105" : "opacity-60 grayscale"}
+              `}
             />
           </Link>
+        ) : (
+          <Image
+            src="/no-image.png"
+            alt="Không có ảnh"
+            width={500}
+            height={500}
+            className="w-full h-full object-contain p-4 opacity-70"
+          />
         )}
 
-        {/* Menu góc phải (so sánh / yêu thích / xem nhanh) */}
-        <ProductSideMenu product={product} />
+        {/* Menu góc phải */}
+        <div className="absolute top-2 right-2">
+          <ProductSideMenu product={product} />
+        </div>
 
-        {/* Nhãn trạng thái */}
-        {product?.status === "sale" ? (
-          <p className="absolute top-2 left-2 z-10 text-xs font-semibold bg-gradient-to-r from-red-500 to-orange-500 text-white px-2 py-0.5 rounded-full shadow-md">
-            Giảm giá
-          </p>
+        {/* Nhãn giảm giá / Hot */}
+        {hasDiscount ? (
+          <span className="absolute top-2 left-2 text-xs font-semibold bg-gradient-to-r from-red-500 to-orange-500 text-white px-2 py-0.5 rounded-full shadow">
+            -{discount}%
+          </span>
         ) : (
-          <Link
-            href={"/deal"}
-            className="absolute top-2 left-2 z-10 bg-orange-100 p-1.5 rounded-full hover:scale-110 transition-transform"
-          >
-            <Flame size={18} fill="#fb6c08" className="text-orange-500" />
+          <Link href={"/deal"} className="absolute top-2 left-2 bg-orange-100 p-1.5 rounded-full shadow-sm">
+            <Flame size={16} fill="#fb6c08" />
           </Link>
         )}
       </div>
 
-      {/* Nội dung sản phẩm */}
-      <div className="p-4 flex flex-col gap-2">
-        {/* Danh mục */}
-        {product?.categories && product.categories.length > 0 && (
-          <p className="uppercase text-xs font-medium text-gray-500 line-clamp-1">
-            {product.categories.join(", ")}
-          </p>
-        )}
+      {/* Nội dung */}
+      <div className="flex flex-col justify-between flex-1 p-4 min-h-[220px]">
+        <div>
+          {/* Danh mục */}
+          {product?.categories?.length ? (
+            <p className="uppercase text-xs font-medium text-gray-500 line-clamp-1">
+              {product.categories.join(", ")}
+            </p>
+          ) : (
+            <p className="text-xs text-gray-400">Không có danh mục</p>
+          )}
 
-        {/* Tên sản phẩm */}
-        <Title className="text-base font-semibold line-clamp-2 group-hover:text-shop_dark_green transition-colors">
-          {product?.name ?? "Sản phẩm không tên"}
-        </Title>
+          {/* Tên sản phẩm */}
+          <Title className="text-base font-semibold text-gray-900 line-clamp-2 mt-1">
+            {product?.name}
+          </Title>
 
-        {/* Đánh giá */}
-        <div className="flex items-center gap-1">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <StarIcon
-              key={`star-${index}`}
-              className={`w-4 h-4 ${
-                index < 4 ? "text-yellow-400" : "text-gray-300"
-              }`}
-              fill={index < 4 ? "#facc15" : "#d1d5db"}
-            />
-          ))}
-          <p className="text-xs text-gray-500 ml-1">(5 đánh giá)</p>
+          {/* Đánh giá (5 sao) */}
+          <div className="flex items-center gap-1 mt-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <StarIcon
+                key={i}
+                className={`w-4 h-4 ${i < 4 ? "text-yellow-400" : "text-gray-300"}`}
+                fill={i < 4 ? "#facc15" : "#d1d5db"}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Giá và kho */}
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <p className="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-400 bg-clip-text text-transparent">
-                {formatVND(finalPrice)}
-              </p>
-              {hasDiscount && (
-                <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-md font-semibold">
-                  -{discount}%
-                </span>
-              )}
-            </div>
-
+        {/* Giá + Kho + Button */}
+        <div className="flex flex-col mt-3 space-y-1">
+          {/* Giá & giảm giá */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-lg font-bold text-shop_dark_green">
+              {formatVND(finalPrice)}
+            </p>
             {hasDiscount && (
-              <p className="text-xs text-gray-400 line-through">
-                {formatVND(price)}
-              </p>
+              <p className="text-xs text-gray-400 line-through">{formatVND(price)}</p>
             )}
           </div>
 
+          {/* Kho */}
           <p
-            className={`text-xs font-medium ${
-              product?.stock === 0
-                ? "text-red-600"
-                : "text-green-600 font-semibold"
+            className={`text-xs font-medium mt-1 ${
+              product?.stock === 0 ? "text-red-600" : "text-green-600"
             }`}
           >
-            {product?.stock === 0
-              ? "Hết hàng"
-              : `Còn ${product?.stock ?? 0} SP`}
+            {product?.stock === 0 ? "Hết hàng" : `Còn ${product?.stock ?? 0} SP`}
           </p>
-        </div>
 
-        {/* Nút thêm vào giỏ */}
-        <AddToCartButton
-          product={product}
-          className="w-full mt-3 rounded-full bg-gradient-to-r from-shop_dark_green to-green-500 text-white hover:opacity-90 transition-all font-semibold"
-        />
+          {/* Nút thêm vào giỏ hàng */}
+          <AddToCartButton
+            product={product}
+            className="
+              w-full mt-3 rounded-full
+              bg-gradient-to-r from-shop_dark_green to-green-500
+              text-white font-semibold text-sm
+              py-2 px-3 text-center
+              hover:opacity-90 transition-all
+              whitespace-normal break-words leading-tight
+            "
+          >
+            Thêm Vào
+          </AddToCartButton>
+        </div>
       </div>
     </div>
   );

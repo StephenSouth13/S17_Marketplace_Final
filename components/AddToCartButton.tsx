@@ -1,83 +1,75 @@
-"use client"; // Sử dụng client
+"use client";
 
-// Nhập các tiện ích và thành phần cần thiết
-import { Product } from "@/sanity.types"; // Nhập định kiểu Sản phẩm (Product type)
-import { Button } from "./ui/button"; // Nhập component Nút (Button)
-import { cn } from "@/lib/utils"; // Nhập tiện ích kết hợp tên lớp (class name utility)
-import { ShoppingBag } from "lucide-react"; // Nhập biểu tượng Túi mua sắm (ShoppingBag icon)
-import useStore from "@/store"; // Nhập hook cửa hàng (store hook)
-import toast from "react-hot-toast"; // Nhập thư viện hiển thị thông báo (toast notifications)
-import PriceFormatter from "./PriceFormatter"; // Nhập component Định dạng giá (PriceFormatter)
-import QuantityButtons from "./QuantityButtons"; // Nhập component Nút Số lượng (QuantityButtons)
+import { Product } from "@/sanity.types";
+import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
+import { ShoppingBag } from "lucide-react";
+import useStore from "@/store";
+import toast from "react-hot-toast";
+import PriceFormatter from "./PriceFormatter";
+import QuantityButtons from "./QuantityButtons";
+import React from "react";
 
-// Định nghĩa giao diện/kiểu cho các props của component
 interface Props {
-  product: Product; // Sản phẩm hiện tại
-  className?: string; // Tên lớp CSS tùy chọn
+  product: Product;
+  className?: string;
+  children?: React.ReactNode;
 }
 
-// Component Nút Thêm vào Giỏ hàng
-const AddToCartButton = ({ product, className }: Props) => {
-  // Lấy hàm và trạng thái từ cửa hàng (store)
+const AddToCartButton: React.FC<Props> = ({ product, className, children }) => {
   const { addItem, getItemCount } = useStore();
-  
-  // Lấy số lượng sản phẩm hiện có trong giỏ hàng
   const itemCount = getItemCount(product?._id);
-  
-  // Kiểm tra xem sản phẩm đã hết hàng chưa
   const isOutOfStock = product?.stock === 0;
 
-  // Hàm xử lý khi thêm sản phẩm vào giỏ hàng
   const handleAddToCart = () => {
-    // Kiểm tra số lượng tồn kho
     if ((product?.stock as number) > itemCount) {
-      addItem(product); // Thêm sản phẩm vào giỏ hàng
+      addItem(product);
       toast.success(
-        `${product?.name?.substring(0, 12)}... đã được thêm thành công!` // Thông báo thành công
+        `${product?.name?.substring(0, 12)}... đã được thêm vào giỏ hàng!`
       );
     } else {
-      // Thông báo lỗi nếu cố gắng thêm nhiều hơn số lượng tồn kho
-      toast.error("Không thể thêm nhiều hơn số lượng tồn kho có sẵn");
+      toast.error("Không thể thêm nhiều hơn số lượng tồn kho có sẵn.");
     }
   };
-  
-  // Trả về JSX để hiển thị
+
   return (
-    <div className="w-full h-12 flex items-center">
-      {/* Hiển thị chi tiết số lượng và tổng phụ nếu sản phẩm đã có trong giỏ hàng */}
+    <div className="w-full h-auto flex flex-col justify-center">
       {itemCount ? (
         <div className="text-sm w-full">
           <div className="flex items-center justify-between">
             <span className="text-xs text-darkColor/80">Số lượng</span>
-            <QuantityButtons product={product} /> {/* Component điều chỉnh số lượng */}
+            <QuantityButtons product={product} />
           </div>
-          <div className="flex items-center justify-between border-t pt-1">
+
+          <div className="flex items-center justify-between border-t pt-1 mt-1">
             <span className="text-xs font-semibold">Tổng phụ</span>
             <PriceFormatter
-              // Tính toán tổng phụ: Giá * Số lượng
-              amount={product?.price ? product?.price * itemCount : 0}
+              amount={product?.price ? product.price * itemCount : 0}
             />
           </div>
         </div>
       ) : (
-        // Hiển thị nút "Thêm vào Giỏ hàng" nếu sản phẩm chưa có trong giỏ hàng
         <Button
-          onClick={handleAddToCart} // Gắn hàm xử lý sự kiện
-          disabled={isOutOfStock} // Vô hiệu hóa nút nếu hết hàng
+          onClick={handleAddToCart}
+          disabled={isOutOfStock}
           className={cn(
-            // Định kiểu CSS cho nút
-            "w-full bg-shop_dark_green/80 text-lightBg shadow-none border border-shop_dark_green/80 font-semibold tracking-wide text-white hover:bg-shop_dark_green hover:border-shop_dark_green hoverEffect",
+            "w-full flex items-center justify-center gap-2 rounded-full py-2.5 px-3 text-sm font-semibold text-white transition-all select-none",
+            "bg-gradient-to-r from-shop_dark_green to-green-500 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed",
+            "whitespace-nowrap overflow-hidden text-ellipsis",
+            "max-sm:text-xs max-sm:py-2",
             className
           )}
         >
-          <ShoppingBag /> {/* Biểu tượng túi mua sắm */}
-          {/* Văn bản hiển thị: "Hết hàng" hoặc "Thêm vào Giỏ hàng" */}
-          {isOutOfStock ? "Hết hàng" : "Thêm vào Giỏ hàng"}
+          <ShoppingBag className="w-4 h-4 shrink-0" />
+          {isOutOfStock
+            ? "Hết hàng"
+            : children
+            ? children
+            : "Thêm vào Giỏ hàng"}
         </Button>
       )}
     </div>
   );
 };
 
-// Xuất component
 export default AddToCartButton;
