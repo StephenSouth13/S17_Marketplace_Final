@@ -1,12 +1,14 @@
-"use client";
 
+
+import { motion } from "framer-motion";
 import AddToCartButton from "@/components/AddToCartButton";
 import Container from "@/components/Container";
 import FavoriteButton from "@/components/FavoriteButton";
 import ImageView from "@/components/ImageView";
 import PriceView from "@/components/PriceView";
 import ProductCharacteristics from "@/components/ProductCharacteristics";
-import { getProductBySlug } from "@/sanity/queries";
+import ProductCard from "@/components/ProductCard";
+import { getProductBySlug, getRelatedProducts } from "@/sanity/queries";
 import { CornerDownLeft, StarIcon, Truck } from "lucide-react";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -15,106 +17,95 @@ import { FiShare2 } from "react-icons/fi";
 import { RxBorderSplit } from "react-icons/rx";
 import { TbTruckDelivery } from "react-icons/tb";
 
-const SingleProductPage = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
-  const { slug } = await params;
+const SingleProductPage = async ({ params }: { params: { slug: string } }) => {
+  const { slug } = params;
   const product = await getProductBySlug(slug);
 
   if (!product) return notFound();
 
+  // Lấy sản phẩm tương tự
+  const relatedProducts = await getRelatedProducts(
+    product._id,
+    product.categories?.[0]
+  );
+
   return (
-    <div className="bg-gradient-to-b from-white via-[#fafafa] to-[#f5f5f5] min-h-screen border-t">
+    <>
+      {/* ========== CHI TIẾT SẢN PHẨM ========== */}
       <Container className="flex flex-col md:flex-row gap-10 py-10">
-        {/* KHỐI 1: HÌNH ẢNH SẢN PHẨM */}
+        {/* Cột trái: Hình ảnh */}
         {product?.images && (
-          <div className="flex-1 flex justify-center items-start sticky md:top-28">
-            <div className="rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 bg-white">
-              <ImageView images={product?.images} isStock={product?.stock} />
-            </div>
-          </div>
+          <ImageView images={product.images} isStock={product.stock} />
         )}
 
-        {/* KHỐI 2: THÔNG TIN CHI TIẾT */}
-        <div className="flex-1 flex flex-col gap-6 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-          {/* Tiêu đề & mô tả */}
-          <div className="space-y-2 border-b border-gray-100 pb-4">
-            <h1 className="text-3xl font-bold text-gray-900 leading-snug">
-              {product?.name}
-            </h1>
-            <p className="text-sm text-gray-600 leading-relaxed">
+        {/* Cột phải: Thông tin sản phẩm */}
+        <div className="w-full md:w-1/2 flex flex-col gap-5">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold text-gray-900">{product?.name}</h2>
+            <p className="text-sm text-gray-600 tracking-wide">
               {product?.description}
             </p>
-
-            <div className="flex items-center gap-1 text-xs mt-1">
+            <div className="flex items-center gap-0.5 text-xs">
               {[...Array(5)].map((_, index) => (
                 <StarIcon
                   key={index}
-                  size={14}
-                  className="text-yellow-400 fill-yellow-400"
+                  size={12}
+                  className="text-shop_light_green"
+                  fill={"#3b9c3c"}
                 />
               ))}
-              <span className="text-gray-600 font-medium ml-1">
-                (120 đánh giá)
-              </span>
+              <p className="font-semibold text-gray-500">(120)</p>
             </div>
           </div>
 
-          {/* Giá và tình trạng kho */}
-          <div className="space-y-3 border-b border-gray-100 pb-5">
+          <div className="space-y-2 border-t border-b border-gray-200 py-5">
             <PriceView
               price={product?.price}
               discount={product?.discount}
-              className="text-2xl font-semibold text-shop_dark_green"
+              className="text-lg font-bold"
             />
             <p
-              className={`px-4 py-1.5 text-sm inline-block font-semibold rounded-lg ${
+              className={`px-4 py-1.5 text-sm text-center inline-block font-semibold rounded-lg ${
                 product?.stock === 0
                   ? "bg-red-100 text-red-600"
-                  : "text-green-700 bg-green-100"
+                  : "text-green-600 bg-green-100"
               }`}
             >
-              {(product?.stock as number) > 0 ? "Còn hàng" : "Hết hàng"}
+              {product?.stock > 0 ? "Còn hàng" : "Hết hàng"}
             </p>
           </div>
 
-          {/* Nút hành động */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 lg:gap-3">
             <AddToCartButton product={product} />
             <FavoriteButton showProduct={true} product={product} />
           </div>
 
-          {/* Accordion thông số kỹ thuật */}
-          <div className="mt-2">
-            <ProductCharacteristics product={product} />
-          </div>
+          <ProductCharacteristics product={product} />
 
-          {/* Liên kết phụ */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-y border-gray-100 py-5">
+          {/* Hành động nhanh */}
+          <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-b-gray-200 py-5 -mt-2">
             {[
-              { icon: <RxBorderSplit />, text: "So sánh" },
-              { icon: <FaRegQuestionCircle />, text: "Đặt câu hỏi" },
-              { icon: <TbTruckDelivery />, text: "Vận chuyển & Trả hàng" },
-              { icon: <FiShare2 />, text: "Chia sẻ" },
-            ].map((item, i) => (
+              { icon: RxBorderSplit, text: "So sánh" },
+              { icon: FaRegQuestionCircle, text: "Đặt câu hỏi" },
+              { icon: TbTruckDelivery, text: "Vận chuyển & Trả hàng" },
+              { icon: FiShare2, text: "Chia sẻ" },
+            ].map((item, idx) => (
               <div
-                key={i}
-                className="flex items-center gap-2 text-sm text-gray-700 hover:text-shop_dark_green transition-colors cursor-pointer"
+                key={idx}
+                className="flex items-center gap-2 text-sm text-black hover:text-shop_orange hoverEffect cursor-pointer"
               >
-                <span className="text-lg">{item.icon}</span>
-                <p className="font-medium">{item.text}</p>
+                <item.icon className="text-lg" />
+                <p>{item.text}</p>
               </div>
             ))}
           </div>
 
-          {/* Vận chuyển & Trả hàng */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex items-center gap-3 border border-gray-100 rounded-xl p-4 bg-gradient-to-br from-white to-green-50/40">
-              <Truck size={28} className="text-shop_light_green" />
+          {/* Chính sách vận chuyển */}
+          <div className="flex flex-col">
+            <div className="border border-lightColor/25 border-b-0 p-3 flex items-center gap-2.5">
+              <Truck size={30} className="text-shop_orange" />
               <div>
-                <p className="text-base font-semibold text-gray-800">
+                <p className="text-base font-semibold text-black">
                   Giao hàng miễn phí
                 </p>
                 <p className="text-sm text-gray-500 underline underline-offset-2">
@@ -122,25 +113,63 @@ const SingleProductPage = async ({
                 </p>
               </div>
             </div>
-
-            <div className="flex items-center gap-3 border border-gray-100 rounded-xl p-4 bg-gradient-to-br from-white to-orange-50/40">
-              <CornerDownLeft size={28} className="text-shop_orange" />
+            <div className="border border-lightColor/25 p-3 flex items-center gap-2.5">
+              <CornerDownLeft size={30} className="text-shop_orange" />
               <div>
-                <p className="text-base font-semibold text-gray-800">
-                  Chính sách trả hàng
+                <p className="text-base font-semibold text-black">
+                  Đổi trả dễ dàng
                 </p>
                 <p className="text-sm text-gray-500">
-                  Miễn phí đổi trả trong 30 ngày.{" "}
-                  <span className="underline underline-offset-2 cursor-pointer">
-                    Xem chi tiết
-                  </span>
+                  Hoàn trả miễn phí trong 30 ngày.{" "}
+                  <span className="underline underline-offset-2">Chi tiết</span>
                 </p>
               </div>
             </div>
           </div>
         </div>
       </Container>
-    </div>
+
+      {/* ========== SẢN PHẨM TƯƠNG TỰ ========== */}
+      {relatedProducts?.length > 0 && (
+        <Container className="mt-12 mb-20">
+          <motion.h2
+            className="text-2xl font-bold mb-6 text-gray-900"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            Sản phẩm tương tự
+          </motion.h2>
+
+          <motion.div
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { staggerChildren: 0.1 },
+              },
+            }}
+          >
+            {relatedProducts.map((p: any) => (
+              <motion.div
+                key={p._id}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
+                <ProductCard product={p} />
+              </motion.div>
+            ))}
+          </motion.div>
+        </Container>
+      )}
+    </>
   );
 };
 

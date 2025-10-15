@@ -99,6 +99,30 @@ const getProductBySlug = async (slug: string) => {
     return null;
   }
 };
+
+const getRelatedProducts = async (currentId: string, category?: string) => {
+  try {
+    if (!category) return [];
+
+    const query = `
+      *[_type == "product" && _id != $currentId && $category in categories[]->title][0...8]{
+        ...,
+        "categories": categories[]->title
+      }
+    `;
+
+    const { data } = await sanityFetch({
+      query,
+      params: { currentId, category },
+    });
+
+    return data ?? [];
+  } catch (error) {
+    console.error("Error fetching related products:", error);
+    return [];
+  }
+};
+
 const getBrand = async (slug: string) => {
   try {
     const product = await sanityFetch({
@@ -231,19 +255,19 @@ const getServiceCategories = async () => {
 };
 
 export {
-  getCategories,
-  getAllBrands,
-  getLatestBlogs,
-  getDealProducts,
-  getProductBySlug,
-  getBrand,
-  getMyOrders,
-  getAllBlogs,
-  getSingleBlog,
-  getBlogCategories,
-  getOthersBlog,
-  // Đã thêm export hàm getServices
-  getServices, 
-  getServiceBySlug,
-  getServiceCategories,
+  getCategories,
+  getAllBrands,
+  getLatestBlogs,
+  getDealProducts,
+  getProductBySlug,
+  getRelatedProducts,
+  getBrand,
+  getMyOrders,
+  getAllBlogs,
+  getSingleBlog,
+  getBlogCategories,
+  getOthersBlog,
+  getServices, 
+  getServiceBySlug,
+  getServiceCategories,
 };
