@@ -3,7 +3,14 @@
 import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { CheckCircle2, Home, Package, ShoppingBag, Truck, Sparkles } from "lucide-react";
+import {
+  CheckCircle2,
+  Home,
+  Package,
+  ShoppingBag,
+  Truck,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import useStore from "@/store";
 import { useAuth } from "@clerk/nextjs";
@@ -18,11 +25,11 @@ const SuccessPageContent = () => {
 
   useEffect(() => {
     if (!isSignedIn) {
-      router.push("/sign-in");
+      router.push("/sign-in"); // ✅ Nếu chưa đăng nhập thì về trang đăng nhập
       return;
     }
     if (orderNumber) {
-      resetCart();
+      resetCart(); // ✅ Reset giỏ hàng sau thanh toán
       console.log(`✅ Giỏ hàng đã được reset sau đơn #${orderNumber}`);
     }
   }, [orderNumber, resetCart, router, isSignedIn]);
@@ -111,7 +118,7 @@ const SuccessPageContent = () => {
           transition={{ delay: 0.6 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
         >
-          {/* Trang chủ */}
+          {/* 🏠 Trang chủ */}
           <Link
             href="/"
             className="flex items-center justify-center py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition"
@@ -120,18 +127,18 @@ const SuccessPageContent = () => {
             Trang Chủ
           </Link>
 
-          {/* Xem đơn hàng */}
+          {/* 📦 Theo dõi đơn hàng */}
           <Link
-            href="/orders"
+            href="/account/orders" // ✅ Đường dẫn chính xác tới phần “Theo dõi đơn hàng”
             className="flex items-center justify-center py-3 rounded-xl border border-emerald-400 bg-white text-emerald-700 font-semibold hover:bg-emerald-50 transition hover:scale-[1.02]"
           >
             <Package className="w-5 h-5 mr-2" />
             Theo Dõi Đơn
           </Link>
 
-          {/* Mua thêm */}
+          {/* 🛍️ Mua thêm */}
           <Link
-            href="/shop"
+            href="/shop" // ✅ Đường dẫn đến trang danh sách sản phẩm
             className="flex items-center justify-center py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-gray-800 font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition"
           >
             <ShoppingBag className="w-5 h-5 mr-2" />
