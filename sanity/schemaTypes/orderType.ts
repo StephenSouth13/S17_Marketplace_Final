@@ -1,4 +1,4 @@
-import { BasketIcon, CheckmarkCircleIcon } from "@sanity/icons";
+import { BasketIcon } from "@sanity/icons";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
 export const orderType = defineType({
@@ -6,9 +6,7 @@ export const orderType = defineType({
   title: "Order",
   type: "document",
   icon: BasketIcon,
-
   fields: [
-    // 🧾 Mã đơn hàng
     defineField({
       name: "orderNumber",
       title: "Order Number",
@@ -16,38 +14,18 @@ export const orderType = defineType({
       validation: (Rule) => Rule.required(),
     }),
 
-    // 💳 Stripe payment info
+    // Các thông tin Stripe / Clerk
     defineField({ name: "stripeCheckoutSessionId", title: "Stripe Checkout Session ID", type: "string" }),
     defineField({ name: "stripeCustomerId", title: "Stripe Customer ID", type: "string" }),
     defineField({ name: "stripePaymentIntentId", title: "Stripe Payment Intent ID", type: "string" }),
+    defineField({ name: "clerkUserId", title: "Store User ID", type: "string" }),
 
-    // 👤 Khách hàng
-    defineField({
-      name: "clerkUserId",
-      title: "Store User ID",
-      type: "string",
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: "userId",
-      title: "User ID",
-      type: "string",
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: "customerName",
-      title: "Customer Name",
-      type: "string",
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: "email",
-      title: "Customer Email",
-      type: "string",
-      validation: (Rule) => Rule.required().email(),
-    }),
+    // Thông tin người dùng
+    defineField({ name: "userId", title: "User ID", type: "string" }),
+    defineField({ name: "customerName", title: "Customer Name", type: "string" }),
+    defineField({ name: "email", title: "Customer Email", type: "string" }),
 
-    // 🛒 Sản phẩm mua
+    // Sản phẩm (new system)
     defineField({
       name: "products",
       title: "Ordered Items",
@@ -58,10 +36,9 @@ export const orderType = defineType({
           fields: [
             defineField({
               name: "product",
-              title: "Product",
+              title: "Product Bought",
               type: "reference",
               to: [{ type: "product" }],
-              validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: "quantity",
@@ -76,16 +53,11 @@ export const orderType = defineType({
               media: "product.images.0",
               quantity: "quantity",
               price: "product.price",
-              discount: "product.discount",
             },
-            prepare({ title, media, quantity, price, discount }) {
-              const discountPrice = discount
-                ? price - price * (discount / 100)
-                : price;
-              const total = discountPrice * quantity;
+            prepare({ title, media, quantity, price }) {
               return {
-                title: `${title} × ${quantity}`,
-                subtitle: `${total.toLocaleString()}₫`,
+                title: `${title} x${quantity}`,
+                subtitle: price ? `${price.toLocaleString()} VND` : "No price",
                 media,
               };
             },
@@ -94,7 +66,48 @@ export const orderType = defineType({
       ],
     }),
 
-    // 💰 Tổng tiền
+    // Legacy order (API v1)
+    defineField({
+      name: "items",
+      title: "Legacy Items (Old Orders)",
+      type: "array",
+      hidden: true,
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({
+              name: "product",
+              title: "Product",
+              type: "object",
+              fields: [
+                { name: "name", title: "Name", type: "string" },
+                { name: "price", title: "Price", type: "number" },
+                {
+                  name: "images",
+                  title: "Images",
+                  type: "array",
+                  of: [{ type: "image" }],
+                },
+              ],
+              preview: {
+                select: { title: "name", price: "price", media: "images.0" },
+                prepare({ title, price, media }) {
+                  return {
+                    title,
+                    subtitle: price ? `${price.toLocaleString()} VND` : "",
+                    media,
+                  };
+                },
+              },
+            }),
+            defineField({ name: "quantity", title: "Quantity", type: "number" }),
+          ],
+        }),
+      ],
+    }),
+
+    // Tổng giá trị
     defineField({
       name: "totalPrice",
       title: "Total Price",
@@ -105,17 +118,16 @@ export const orderType = defineType({
       name: "amountDiscount",
       title: "Amount Discount",
       type: "number",
-      initialValue: 0,
+      validation: (Rule) => Rule.min(0),
     }),
     defineField({
       name: "currency",
       title: "Currency",
       type: "string",
       initialValue: "VND",
-      validation: (Rule) => Rule.required(),
     }),
 
-    // 🚚 Địa chỉ giao hàng
+    // Địa chỉ giao hàng
     defineField({
       name: "address",
       title: "Shipping Address",
@@ -133,7 +145,7 @@ export const orderType = defineType({
           options: {
             list: [
               { title: "Home", value: "home" },
-              { title: "Office", value: "office" },
+              { title: "Work", value: "work" },
             ],
           },
         }),
@@ -146,21 +158,18 @@ export const orderType = defineType({
       ],
     }),
 
-    // 🏦 Phương thức thanh toán
+    // Phương thức thanh toán, trạng thái, thời gian
     defineField({
       name: "paymentMethod",
       title: "Payment Method",
       type: "string",
       options: {
         list: [
-          { title: "Cash on Delivery", value: "cod" },
           { title: "Bank Transfer", value: "bank" },
-          { title: "Stripe", value: "stripe" },
+          { title: "Cash on Delivery", value: "cod" },
         ],
       },
     }),
-
-    // 🔄 Trạng thái đơn hàng
     defineField({
       name: "status",
       title: "Order Status",
@@ -176,53 +185,25 @@ export const orderType = defineType({
           { title: "Cancelled", value: "cancelled" },
         ],
       },
-      initialValue: "pending",
     }),
-
-    // 🕓 Ngày tạo
-    defineField({
-      name: "createdAt",
-      title: "Created At",
-      type: "datetime",
-      initialValue: () => new Date().toISOString(),
-    }),
-
-    // 📅 Ngày đặt hàng
-    defineField({
-      name: "orderDate",
-      title: "Order Date",
-      type: "datetime",
-      validation: (Rule) => Rule.required(),
-    }),
+    defineField({ name: "createdAt", title: "Created At", type: "datetime" }),
+    defineField({ name: "orderDate", title: "Order Date", type: "datetime" }),
   ],
 
-  // 👁️ Preview
+  // Preview hiển thị ở list
   preview: {
     select: {
-      customerName: "customerName",
-      total: "totalPrice",
+      name: "customerName",
+      amount: "totalPrice",
       currency: "currency",
-      status: "status",
       payment: "paymentMethod",
-      email: "email",
+      status: "status",
     },
-    prepare({ customerName, total, currency, status, payment, email }) {
-      const paymentText =
-        payment === "cod"
-          ? "COD"
-          : payment === "bank"
-          ? "Bank Transfer"
-          : "Stripe";
-      const formattedTotal = `${total?.toLocaleString()} ${currency || "VND"}`;
-      const statusIcon =
-        status === "paid" || status === "delivered"
-          ? CheckmarkCircleIcon
-          : BasketIcon;
-
+    prepare({ name, amount, currency, payment, status }) {
       return {
-        title: `${customerName || "Unknown"} — ${formattedTotal}`,
-        subtitle: `${paymentText} • ${status}`,
-        media: statusIcon,
+        title: name || "Unknown",
+        subtitle: `${amount?.toLocaleString() || 0} ${currency || "VND"} • ${payment || "Unknown"} • ${status || "pending"}`,
+        media: BasketIcon,
       };
     },
   },
