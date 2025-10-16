@@ -144,18 +144,23 @@ const getBrand = async (slug: string) => {
   }
 };
 const getMyOrders = async (userId: string) => {
-  try {
-    // ...
-  } catch (error) {
-    // Sửa tại đây
-    console.error("Error fetching user orders:", error); 
-    if (error instanceof Error) {
-        console.error("Error message:", error.message);
-    } else {
-        console.error("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
-    }
-    return null;
-  }
+  try {
+    const { data } = await sanityFetch({
+      query: MY_ORDERS_QUERY,
+      params: { userId },
+    });
+
+    // Trả về mảng rỗng nếu không có dữ liệu
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Error fetching user orders:", error); 
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+    } else {
+      console.error("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    }
+    return [];
+  }
 };
 
 const getAllBlogs = async (quantity: number) => {

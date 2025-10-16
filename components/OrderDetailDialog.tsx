@@ -1,3 +1,6 @@
+//component hiển thị chi tiết đơn hàng trong một hộp thoại.
+// D:\Website\Cty CP S17\final\S17_Marketplace_Final_\components\OrderDetailDialog.tsx
+"use client";
 import { MY_ORDERS_QUERYResult } from "@/sanity.types";
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";

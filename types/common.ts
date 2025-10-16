@@ -1,3 +1,4 @@
+// types/common.ts
 import { Category } from "@/sanity.types";
 
 /**

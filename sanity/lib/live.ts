@@ -1,3 +1,4 @@
+//sanity/lib/live.ts
 // Minimal sanityFetch implementation using the existing client
 // This avoids relying on next-sanity/live which isn't available in the installed package.
 import { client } from './client'

@@ -1,3 +1,4 @@
+// components/HomeTabbar.tsx
 "use client";
 import { productType } from "@/constants/data";
 import Link from "next/link";
