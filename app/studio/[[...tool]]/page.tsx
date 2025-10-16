@@ -7,7 +7,7 @@ const StudioClient = dynamic(() => import("./StudioClient"), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center min-h-screen text-gray-500">
-      Đang tải Sanity Studio...
+      Đang vào trang quản trị...
     </div>
   ),
 });
