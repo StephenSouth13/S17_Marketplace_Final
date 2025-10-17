@@ -1,5 +1,3 @@
-
-
 import { motion } from "framer-motion";
 import AddToCartButton from "@/components/AddToCartButton";
 import Container from "@/components/Container";
@@ -17,8 +15,13 @@ import { FiShare2 } from "react-icons/fi";
 import { RxBorderSplit } from "react-icons/rx";
 import { TbTruckDelivery } from "react-icons/tb";
 
-const SingleProductPage = async ({ params }: { params: { slug: string } }) => {
-  const { slug } = params;
+// ✅ Fix: Trong Next.js 15, params là Promise nên cần await
+interface ProductPageProps {
+  params: Promise<{ slug: string }>;
+}
+
+const SingleProductPage = async ({ params }: ProductPageProps) => {
+  const { slug } = await params; // ✅ Bắt buộc phải await
   const product = await getProductBySlug(slug);
 
   if (!product) return notFound();
@@ -41,7 +44,9 @@ const SingleProductPage = async ({ params }: { params: { slug: string } }) => {
         {/* Cột phải: Thông tin sản phẩm */}
         <div className="w-full md:w-1/2 flex flex-col gap-5">
           <div className="space-y-1">
-            <h2 className="text-2xl font-bold text-gray-900">{product?.name}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {product?.name}
+            </h2>
             <p className="text-sm text-gray-600 tracking-wide">
               {product?.description}
             </p>
