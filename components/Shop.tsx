@@ -56,11 +56,12 @@ const Shop = ({ categories, brands }: Props) => {
         }
       `;
 
-      const data = await client.fetch(
-        query,
-        { selectedCategory, selectedBrand, minPrice, maxPrice },
-        { next: { revalidate: 0 } }
-      );
+      const data = await client.fetch(query, {
+        selectedCategory,
+        selectedBrand,
+        minPrice,
+        maxPrice,
+      });
       setProducts(data);
     } catch (error) {
       // 🚨 KHU VỰC SỬA LỖI: In chi tiết đối tượng lỗi để debug
