@@ -269,7 +269,10 @@ export default function AddressesPage() {
 
           <RadioGroup
             value={selectedId ?? ""}
-            onValueChange={(val) => handleSetDefault(val)}
+            onValueChange={(val) => {
+              setSelectedId(val);
+              handleSetDefault(val);
+            }}
             className="space-y-4"
           >
             {addresses.length === 0 ? (
@@ -300,7 +303,7 @@ export default function AddressesPage() {
                         {addr.street}, {addr.district}, {addr.city}
                       </p>
                       <p className="text-sm text-gray-500 mt-1">
-                        📞 {addr.phone} • 🏠{" "}
+                        ��� {addr.phone} • 🏠{" "}
                         {addr.type === "home"
                           ? "Nhà riêng"
                           : addr.type === "office"

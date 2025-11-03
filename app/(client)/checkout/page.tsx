@@ -78,6 +78,11 @@ const CheckoutPage = () => {
       return;
     }
 
+    if (total <= 0) {
+      toast.error("Tổng giá không hợp lệ!");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -87,8 +92,19 @@ const CheckoutPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user?.id,
-          items,
-          address: selectedAddress,
+          items: items.map(item => ({
+            product: item.product,
+            quantity: item.quantity,
+          })),
+          address: {
+            fullName: selectedAddress.fullName || selectedAddress.name,
+            phone: selectedAddress.phone,
+            street: selectedAddress.street || selectedAddress.address,
+            district: selectedAddress.district,
+            city: selectedAddress.city || selectedAddress.state,
+            type: selectedAddress.type || "home",
+            isDefault: selectedAddress.isDefault || selectedAddress.default,
+          },
           total,
           paymentMethod,
         }),
