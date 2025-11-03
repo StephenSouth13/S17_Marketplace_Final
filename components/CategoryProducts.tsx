@@ -41,7 +41,7 @@ const CategoryProducts = ({ categories, slug }: Props) => {
       if (error instanceof Error) {
           console.error("Chi tiết lỗi:", error.message, error.stack);
       } else if (error && typeof error === 'object') {
-          console.error("Đối tượng lỗi đầy đủ:", JSON.stringify(error, Object.getOwnPropertyNames(error))); 
+          console.error("Đối tượng lỗi đầy đủ:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
       } else {
           console.error("Lỗi không phải đối tượng:", String(error));
       }
@@ -49,7 +49,7 @@ const CategoryProducts = ({ categories, slug }: Props) => {
     } finally {
       setLoading(false);
     }
-  }, [setProducts, setLoading, client]); // Thêm dependencies
+  }, []);
 
   useEffect(() => {
     fetchProducts(currentSlug);
