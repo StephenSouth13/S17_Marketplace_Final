@@ -24,6 +24,24 @@ export const orderType = defineType({
     defineField({ name: "userId", title: "User ID", type: "string" }),
     defineField({ name: "customerName", title: "Customer Name", type: "string" }),
     defineField({ name: "email", title: "Customer Email", type: "string" }),
+    defineField({
+      name: "buyerName",
+      title: "Tên Người Mua",
+      type: "string",
+      description: "Tên người mua hàng (dùng để lọc)",
+    }),
+    defineField({
+      name: "buyerPhone",
+      title: "Số Điện Thoại Người Mua",
+      type: "string",
+      description: "Số điện thoại người mua (dùng để lọc)",
+    }),
+    defineField({
+      name: "buyerAddress",
+      title: "Địa Chỉ Giao Hàng (Chuỗi)",
+      type: "string",
+      description: "Địa chỉ giao hàng dạng chuỗi (dùng để lọc)",
+    }),
 
     // Sản phẩm (new system)
     defineField({
