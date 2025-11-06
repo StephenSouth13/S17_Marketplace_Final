@@ -3,8 +3,8 @@ import Title from "@/components/Title";
 import { Mail, Phone, MapPin } from "lucide-react";
 import React from "react";
 // Giả định bạn có component Input và Button
-// import { Input } from "@/components/ui/input"; 
-// import { Button } from "@/components/ui/button"; 
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
 
 // Dữ liệu liên hệ
 const CONTACT_INFO = [
@@ -28,7 +28,8 @@ const CONTACT_INFO = [
     },
 ];
 
-const ContactPage = () => {
+const ContactPage = ({ searchParams }: { searchParams: { service?: string } }) => {
+    const prefillService = searchParams?.service ? decodeURIComponent(searchParams.service) : "";
     return (
         <div className="py-12 md:py-20 bg-gray-50">
             <Container className="max-w-6xl">
