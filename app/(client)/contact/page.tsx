@@ -28,8 +28,64 @@ const CONTACT_INFO = [
     },
 ];
 
-const ContactPage = ({ searchParams }: { searchParams: { service?: string } }) => {
+"use client";
+
+import { useState } from "react";
+import toast from "react-hot-toast";
+
+interface ContactPageProps {
+  searchParams?: { service?: string };
+}
+
+const ContactPage = ({ searchParams }: ContactPageProps) => {
     const prefillService = searchParams?.service ? decodeURIComponent(searchParams.service) : "";
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+      fullName: "",
+      email: "",
+      phone: "",
+      subject: prefillService || "",
+      message: prefillService ? `Tôi quan tâm đến: ${prefillService}\n\n` : "",
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setLoading(true);
+
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        const json = await res.json();
+
+        if (!res.ok) {
+          throw new Error(json.error || "Gửi yêu cầu thất bại");
+        }
+
+        toast.success(json.message);
+        setFormData({
+          fullName: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+      } catch (err) {
+        console.error("Contact form error:", err);
+        toast.error(err instanceof Error ? err.message : "Có lỗi xảy ra");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     return (
         <div className="py-12 md:py-20 bg-gray-50">
             <Container className="max-w-6xl">
