@@ -72,7 +72,7 @@ export default function AddressesPage() {
     }
   }, [user?.id]);
 
-  // 🔸 Thêm địa chỉ mới
+  // 🔸 Thêm địa ch��� mới
   const handleAdd = async () => {
     if (addresses.length >= MAX_ADDRESSES)
       return toast.error("Bạn chỉ có thể lưu tối đa 3 địa chỉ!");
@@ -158,109 +158,10 @@ export default function AddressesPage() {
     }
   };
 
-  // 🧩 Form nhập địa chỉ
-  const AddAddressForm = () => (
-    <motion.div
-      key="add-form"
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      transition={{ duration: 0.25 }}
-      className="mt-6 space-y-4 border rounded-2xl p-6 bg-white shadow-sm"
-    >
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">
-        Thêm địa chỉ mới
-      </h3>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>Họ tên người nhận</Label>
-          <Input
-            value={form.fullName}
-            onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-            placeholder="VD: Nguyễn Văn A"
-          />
-        </div>
-        <div>
-          <Label>Số điện thoại</Label>
-          <Input
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            placeholder="VD: 0909123456"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label>Địa chỉ cụ thể</Label>
-        <Input
-          value={form.street}
-          onChange={(e) => setForm({ ...form, street: e.target.value })}
-          placeholder="Số nhà, đường..."
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label>Quận / Huyện</Label>
-          <Input
-            value={form.district}
-            onChange={(e) => setForm({ ...form, district: e.target.value })}
-            placeholder="Quận 1"
-          />
-        </div>
-        <div>
-          <Label>Thành phố</Label>
-          <Input
-            value={form.city}
-            onChange={(e) => setForm({ ...form, city: e.target.value })}
-            placeholder="TP.HCM"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label>Loại địa chỉ</Label>
-        <RadioGroup
-          className="flex gap-6 mt-2"
-          value={form.type}
-          onValueChange={(val) => setForm({ ...form, type: val })}
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="home" id="home" />
-            <Label htmlFor="home" className="flex items-center gap-1">
-              <Home className="w-4 h-4" /> Nhà riêng
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="office" id="office" />
-            <Label htmlFor="office" className="flex items-center gap-1">
-              <Building2 className="w-4 h-4" /> Văn phòng
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="other" id="other" />
-            <Label htmlFor="other" className="flex items-center gap-1">
-              <MoreHorizontal className="w-4 h-4" /> Khác
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      <div className="flex justify-end gap-2 pt-4">
-        <Button variant="outline" onClick={() => setIsAdding(false)} className="rounded-full">
-          Hủy
-        </Button>
-        <Button
-          onClick={handleAdd}
-          disabled={loading}
-          className="rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:opacity-90"
-        >
-          {loading ? "Đang lưu..." : "Lưu ��ịa chỉ"}
-        </Button>
-      </div>
-    </motion.div>
-  );
+  // 🧩 Hàm xử lý thay đổi form
+  const handleFormChange = (field: string, value: string) => {
+    setForm({ ...form, [field]: value } as typeof form);
+  };
 
   if (pageLoading) {
     return (
