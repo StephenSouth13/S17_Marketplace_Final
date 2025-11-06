@@ -134,6 +134,7 @@ const ContactPage = ({ searchParams }: { searchParams: { service?: string } }) =
                                         id="subject"
                                         name="subject"
                                         className="w-full p-3 border border-gray-300 bg-white rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150 appearance-none"
+                                        defaultValue={prefillService || ""}
                                         required
                                     >
                                         <option value="" disabled>Chọn lĩnh vực</option>
