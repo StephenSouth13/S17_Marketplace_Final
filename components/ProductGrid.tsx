@@ -38,8 +38,8 @@ const ProductGrid = () => {
       try {
         let query =
           variantValue === "all"
-            ? `*[_type == "product"] | order(_createdAt desc){..., "categories": categories[]->title}`
-            : `*[_type == "product" && variant == $variant] | order(_createdAt desc){..., "categories": categories[]->title}`;
+            ? `*[_type == "product" && isFeatured == true] | order(_createdAt desc){..., "categories": categories[]->title}`
+            : `*[_type == "product" && variant == $variant && isFeatured == true] | order(_createdAt desc){..., "categories": categories[]->title}`;
 
         const res =
           variantValue === "all"
