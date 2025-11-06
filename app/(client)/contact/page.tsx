@@ -3,8 +3,8 @@ import Title from "@/components/Title";
 import { Mail, Phone, MapPin } from "lucide-react";
 import React from "react";
 // Giả định bạn có component Input và Button
-// import { Input } from "@/components/ui/input"; 
-// import { Button } from "@/components/ui/button"; 
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
 
 // Dữ liệu liên hệ
 const CONTACT_INFO = [
@@ -28,7 +28,64 @@ const CONTACT_INFO = [
     },
 ];
 
-const ContactPage = () => {
+"use client";
+
+import { useState } from "react";
+import toast from "react-hot-toast";
+
+interface ContactPageProps {
+  searchParams?: { service?: string };
+}
+
+const ContactPage = ({ searchParams }: ContactPageProps) => {
+    const prefillService = searchParams?.service ? decodeURIComponent(searchParams.service) : "";
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+      fullName: "",
+      email: "",
+      phone: "",
+      subject: prefillService || "",
+      message: prefillService ? `Tôi quan tâm đến: ${prefillService}\n\n` : "",
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setLoading(true);
+
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        const json = await res.json();
+
+        if (!res.ok) {
+          throw new Error(json.error || "Gửi yêu cầu thất bại");
+        }
+
+        toast.success(json.message);
+        setFormData({
+          fullName: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+      } catch (err) {
+        console.error("Contact form error:", err);
+        toast.error(err instanceof Error ? err.message : "Có lỗi xảy ra");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     return (
         <div className="py-12 md:py-20 bg-gray-50">
             <Container className="max-w-6xl">
@@ -83,43 +140,48 @@ const ContactPage = () => {
                     {/* Phần 2: Form Liên hệ (Bên phải PC, Dưới Mobile) */}
                     <div className="lg:col-span-2 p-8 md:p-10 bg-white rounded-xl shadow-xl">
                         <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-3">Gửi Yêu Cầu Tư Vấn</h2>
-                        <form className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 
                                 {/* Tên */}
                                 <div>
-                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>
-                                    {/* Thay thế bằng component Input của bạn */}
-                                    <input 
-                                        type="text" 
-                                        id="name" 
-                                        name="name" 
+                                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>
+                                    <input
+                                        type="text"
+                                        id="fullName"
+                                        name="fullName"
+                                        value={formData.fullName}
+                                        onChange={handleChange}
                                         placeholder="Nhập tên của bạn"
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
                                         required
                                     />
                                 </div>
-                                
+
                                 {/* Email */}
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <input 
-                                        type="email" 
-                                        id="email" 
-                                        name="email" 
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
                                         placeholder="Nhập địa chỉ email"
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
                                         required
                                     />
                                 </div>
-                                
+
                                 {/* Số điện thoại */}
                                 <div>
                                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Số Điện Thoại</label>
-                                    <input 
-                                        type="tel" 
-                                        id="phone" 
-                                        name="phone" 
+                                    <input
+                                        type="tel"
+                                        id="phone"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
                                         placeholder="VD: 090xxxxxxx"
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
                                         required
@@ -132,10 +194,12 @@ const ContactPage = () => {
                                     <select
                                         id="subject"
                                         name="subject"
+                                        value={formData.subject}
+                                        onChange={handleChange}
                                         className="w-full p-3 border border-gray-300 bg-white rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150 appearance-none"
                                         required
                                     >
-                                        <option value="" disabled>Chọn lĩnh vực</option>
+                                        <option value="">Chọn lĩnh vực</option>
                                         <option value="E-commerce">Giải pháp Thương mại điện tử</option>
                                         <option value="Investment">Tư vấn Đầu tư</option>
                                         <option value="Coaching">Chương trình Coaching/Mentoring</option>
@@ -151,6 +215,8 @@ const ContactPage = () => {
                                     id="message"
                                     name="message"
                                     rows={5}
+                                    value={formData.message}
+                                    onChange={handleChange}
                                     placeholder="Xin vui lòng mô tả yêu cầu của bạn..."
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
                                     required
@@ -159,12 +225,12 @@ const ContactPage = () => {
 
                             {/* Nút Gửi */}
                             <div className="flex justify-end">
-                                {/* Thay thế bằng component Button của bạn */}
                                 <button
                                     type="submit"
-                                    className="px-8 py-3 bg-shop_dark_green text-white font-semibold rounded-lg shadow-md hover:bg-shop_dark_green/90 transition-all duration-300 ease-in-out transform hover:scale-[1.01] flex items-center gap-2"
+                                    disabled={loading}
+                                    className="px-8 py-3 bg-shop_dark_green text-white font-semibold rounded-lg shadow-md hover:bg-shop_dark_green/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-[1.01] flex items-center gap-2"
                                 >
-                                    Gửi Yêu Cầu <Mail size={18} />
+                                    {loading ? "Đang gửi..." : "Gửi Yêu Cầu"} <Mail size={18} />
                                 </button>
                             </div>
                         </form>

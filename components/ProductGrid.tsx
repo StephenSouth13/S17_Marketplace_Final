@@ -16,42 +16,41 @@ const ProductGrid = () => {
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState(productType[0]?.title || "");
   const [isClient, setIsClient] = useState(false);
-  const [variantValue, setVariantValue] = useState(
-    productType.find((p) => p.title === productType[0]?.title)?.value || "all"
-  );
+
+  // Get variant value from selected tab (memoized)
+  const variantValue = productType.find((p) => p.title === selectedTab)?.value || "all";
 
   // Bảo đảm chỉ fetch khi đã mount client
-  useEffect(() => setIsClient(true), []);
-
-  // Cập nhật variant khi tab đổi
   useEffect(() => {
-    const newValue =
-      productType.find((p) => p.title === selectedTab)?.value || "all";
-    setVariantValue(newValue);
-  }, [selectedTab]);
+    setIsClient(true);
+  }, []);
 
-  // Fetch sản phẩm từ Sanity
+  // Fetch sản phẩm từ Sanity - optimized to prevent infinite loops
   useEffect(() => {
     if (!isClient) return;
+
     const fetchData = async () => {
       setLoading(true);
       try {
-        let query =
+        const query =
           variantValue === "all"
-            ? `*[_type == "product"] | order(_createdAt desc){..., "categories": categories[]->title}`
-            : `*[_type == "product" && variant == $variant] | order(_createdAt desc){..., "categories": categories[]->title}`;
+            ? `*[_type == "product" && isFeatured == true] | order(_createdAt desc){..., "categories": categories[]->title}`
+            : `*[_type == "product" && variant == $variant && isFeatured == true] | order(_createdAt desc){..., "categories": categories[]->title}`;
 
         const res =
           variantValue === "all"
             ? await client.fetch(query)
             : await client.fetch(query, { variant: variantValue });
+
         setProducts(res);
       } catch (err) {
         console.error("❌ LỖI TẢI SẢN PHẨM:", err);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, [variantValue, isClient]);
 

@@ -123,7 +123,12 @@ const ServiceDetailPage = async ({ params }: { params: { slug: string } }) => {
                             ) : (
                                 <div className="text-xl font-bold text-shop_dark_green">Liên hệ để báo giá</div>
                             )}
-                            <Button className="rounded-full bg-shop_light_green hover:bg-shop_btn_dark_green px-6">Yêu cầu Báo giá</Button>
+                            <Link
+                                href={`/contact?service=${encodeURIComponent(`Tư vấn ${service.title}`)}`}
+                                className="rounded-full bg-shop_light_green hover:bg-shop_btn_dark_green px-6 py-2 text-white font-semibold transition-colors"
+                            >
+                                Yêu cầu Báo giá
+                            </Link>
                         </div>
                     </div>
                 )}

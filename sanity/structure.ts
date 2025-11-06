@@ -4,4 +4,15 @@ import type {StructureResolver} from 'sanity/structure'
 export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
-    .items(S.documentTypeListItems())
+    .items([
+      // Contact Submissions Management
+      S.documentTypeListItem('contactSubmission').title('📧 Yêu Cầu Liên Hệ'),
+
+      // Contact Person Management
+      S.documentTypeListItem('contactPerson').title('👥 Người Liên Hệ'),
+
+      // Rest of document types
+      ...S.documentTypeListItems().filter(
+        (item: any) => item.getId && item.getId() !== 'contactSubmission' && item.getId() !== 'contactPerson'
+      ),
+    ])

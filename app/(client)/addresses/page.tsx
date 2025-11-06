@@ -11,7 +11,6 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   RadioGroup,
@@ -27,6 +26,7 @@ import {
   Home,
   MoreHorizontal,
 } from "lucide-react";
+import AddressForm from "@/components/AddressForm";
 
 const MAX_ADDRESSES = 3;
 
@@ -36,6 +36,7 @@ export default function AddressesPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -50,6 +51,7 @@ export default function AddressesPage() {
   const fetchAddresses = async () => {
     if (!user?.id) return;
     try {
+      setPageLoading(true);
       const res = await fetch(`/api/address?userId=${user.id}`, { cache: "no-store" });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Lỗi tải dữ liệu");
@@ -59,20 +61,27 @@ export default function AddressesPage() {
     } catch (err) {
       console.error("Fetch address error:", err);
       toast.error("Không thể tải danh sách địa chỉ!");
+    } finally {
+      setPageLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAddresses();
+    if (user?.id) {
+      fetchAddresses();
+    }
   }, [user?.id]);
 
-  // 🔸 Thêm địa chỉ mới
+  // 🔸 Thêm địa ch��� mới
   const handleAdd = async () => {
     if (addresses.length >= MAX_ADDRESSES)
       return toast.error("Bạn chỉ có thể lưu tối đa 3 địa chỉ!");
 
     if (!form.fullName || !form.phone || !form.street || !form.city)
       return toast.error("Vui lòng điền đầy đủ thông tin!");
+
+    if (!user?.id || !user?.emailAddresses?.[0]?.emailAddress)
+      return toast.error("Không thể lấy thông tin tài khoản!");
 
     setLoading(true);
     try {
@@ -81,7 +90,9 @@ export default function AddressesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          userId: user?.id,
+          userId: user.id,
+          userEmail: user.emailAddresses[0].emailAddress,
+          customerPhone: form.phone,
           isDefault: addresses.length === 0,
         }),
       });
@@ -147,109 +158,43 @@ export default function AddressesPage() {
     }
   };
 
-  // 🧩 Form nhập địa chỉ
-  const AddAddressForm = () => (
-    <motion.div
-      key="add-form"
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      transition={{ duration: 0.25 }}
-      className="mt-6 space-y-4 border rounded-2xl p-6 bg-white shadow-sm"
-    >
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">
-        Thêm địa chỉ mới
-      </h3>
+  // 🧩 Hàm xử lý thay đổi form
+  const handleFormChange = (field: string, value: string) => {
+    setForm({ ...form, [field]: value } as typeof form);
+  };
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>Họ tên người nhận</Label>
-          <Input
-            value={form.fullName}
-            onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-            placeholder="VD: Nguyễn Văn A"
-          />
-        </div>
-        <div>
-          <Label>Số điện thoại</Label>
-          <Input
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            placeholder="VD: 0909123456"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label>Địa chỉ cụ thể</Label>
-        <Input
-          value={form.street}
-          onChange={(e) => setForm({ ...form, street: e.target.value })}
-          placeholder="Số nhà, đường..."
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label>Quận / Huyện</Label>
-          <Input
-            value={form.district}
-            onChange={(e) => setForm({ ...form, district: e.target.value })}
-            placeholder="Quận 1"
-          />
-        </div>
-        <div>
-          <Label>Thành phố</Label>
-          <Input
-            value={form.city}
-            onChange={(e) => setForm({ ...form, city: e.target.value })}
-            placeholder="TP.HCM"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label>Loại địa chỉ</Label>
-        <RadioGroup
-          className="flex gap-6 mt-2"
-          value={form.type}
-          onValueChange={(val) => setForm({ ...form, type: val })}
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="home" id="home" />
-            <Label htmlFor="home" className="flex items-center gap-1">
-              <Home className="w-4 h-4" /> Nhà riêng
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="office" id="office" />
-            <Label htmlFor="office" className="flex items-center gap-1">
-              <Building2 className="w-4 h-4" /> Văn phòng
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="other" id="other" />
-            <Label htmlFor="other" className="flex items-center gap-1">
-              <MoreHorizontal className="w-4 h-4" /> Khác
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      <div className="flex justify-end gap-2 pt-4">
-        <Button variant="outline" onClick={() => setIsAdding(false)} className="rounded-full">
-          Hủy
-        </Button>
-        <Button
-          onClick={handleAdd}
-          disabled={loading}
-          className="rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:opacity-90"
-        >
-          {loading ? "Đang lưu..." : "Lưu địa chỉ"}
-        </Button>
-      </div>
-    </motion.div>
-  );
+  if (pageLoading) {
+    return (
+      <motion.div
+        className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-10 px-4 sm:px-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <Card className="max-w-3xl mx-auto border border-gray-100 shadow-lg rounded-3xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-2xl font-semibold text-gray-800">
+              <MapPin className="text-green-600" /> Quản lý địa chỉ giao hàng
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Separator className="my-4" />
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-start gap-3 p-4 border rounded-2xl bg-gray-50 animate-pulse">
+                  <div className="w-5 h-5 bg-gray-300 rounded-full flex-shrink-0 mt-1" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-gray-300 rounded w-1/3" />
+                    <div className="h-3 bg-gray-300 rounded w-2/3" />
+                    <div className="h-3 bg-gray-300 rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -327,7 +272,15 @@ export default function AddressesPage() {
           </RadioGroup>
 
           <AnimatePresence mode="wait">
-            {isAdding && <AddAddressForm />}
+            {isAdding && (
+              <AddressForm
+                form={form}
+                onFormChange={handleFormChange}
+                onCancel={() => setIsAdding(false)}
+                onSubmit={handleAdd}
+                loading={loading}
+              />
+            )}
           </AnimatePresence>
 
           {!isAdding && addresses.length < MAX_ADDRESSES && (
