@@ -257,6 +257,39 @@ export default function AddressesPage() {
     </motion.div>
   );
 
+  if (pageLoading) {
+    return (
+      <motion.div
+        className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-10 px-4 sm:px-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <Card className="max-w-3xl mx-auto border border-gray-100 shadow-lg rounded-3xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-2xl font-semibold text-gray-800">
+              <MapPin className="text-green-600" /> Quản lý địa chỉ giao hàng
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Separator className="my-4" />
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-start gap-3 p-4 border rounded-2xl bg-gray-50 animate-pulse">
+                  <div className="w-5 h-5 bg-gray-300 rounded-full flex-shrink-0 mt-1" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-gray-300 rounded w-1/3" />
+                    <div className="h-3 bg-gray-300 rounded w-2/3" />
+                    <div className="h-3 bg-gray-300 rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-10 px-4 sm:px-10"
