@@ -22,6 +22,8 @@ export const metadata: Metadata = {
     "chợ thương mại số",
     "sàn giao dịch Việt",
     "doanh nghiệp Việt",
+    "Trung tâm phát triển kinh tế",
+    "Trung tâm phát triển kinh tế số",
   ],
   metadataBase: new URL("https://www.s17.org.vn"), // cực kỳ quan trọng cho OG image
 
