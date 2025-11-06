@@ -272,7 +272,15 @@ export default function AddressesPage() {
           </RadioGroup>
 
           <AnimatePresence mode="wait">
-            {isAdding && <AddAddressForm />}
+            {isAdding && (
+              <AddressForm
+                form={form}
+                onFormChange={handleFormChange}
+                onCancel={() => setIsAdding(false)}
+                onSubmit={handleAdd}
+                loading={loading}
+              />
+            )}
           </AnimatePresence>
 
           {!isAdding && addresses.length < MAX_ADDRESSES && (
