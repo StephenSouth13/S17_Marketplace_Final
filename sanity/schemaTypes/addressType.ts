@@ -25,7 +25,7 @@ export const addressType = defineType({
       name: "customerPhone",
       title: "Số điện thoại khách hàng",
       type: "string",
-      description: "Số ��iện thoại của khách hàng (để quản lý dễ hơn)",
+      description: "Số điện thoại của khách hàng (để quản lý dễ hơn)",
       validation: (Rule) => Rule.required().error("Vui lòng nhập số điện thoại khách hàng"),
     }),
     defineField({
@@ -100,8 +100,10 @@ export const addressType = defineType({
       district: "district",
       type: "type",
       isDefault: "isDefault",
+      userEmail: "userEmail",
+      customerPhone: "customerPhone",
     },
-    prepare({ title, subtitle, city, district, type, isDefault }) {
+    prepare({ title, subtitle, city, district, type, isDefault, userEmail, customerPhone }) {
       const typeMap: Record<string, string> = {
         home: "🏠 Nhà riêng",
         office: "💼 Văn phòng",
@@ -110,7 +112,7 @@ export const addressType = defineType({
 
       return {
         title: `${title} ${isDefault ? "⭐ [Mặc định]" : ""}`,
-        subtitle: `${subtitle}, ${district}, ${city} — ${typeMap[type] || ""}`,
+        subtitle: `${userEmail} | 📱 ${customerPhone} | ${subtitle}, ${district}, ${city} — ${typeMap[type] || ""}`,
       };
     },
   },
