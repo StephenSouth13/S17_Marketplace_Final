@@ -24,9 +24,9 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { userId, fullName, phone, street, district, city, type } = body;
+    const { userId, userEmail, customerPhone, fullName, phone, street, district, city, type } = body;
 
-    if (!userId || !fullName || !phone || !street || !city)
+    if (!userId || !userEmail || !customerPhone || !fullName || !phone || !street || !city)
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
     // ✅ Kiểm tra số lượng địa chỉ hiện có
@@ -41,6 +41,8 @@ export async function POST(req: Request) {
     const doc = {
       _type: "address",
       userId,
+      userEmail,
+      customerPhone,
       fullName,
       phone,
       street,
