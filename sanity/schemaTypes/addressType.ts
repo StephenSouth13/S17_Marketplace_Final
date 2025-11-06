@@ -15,6 +15,20 @@ export const addressType = defineType({
       validation: (Rule) => Rule.required().error("Thiếu userId"),
     }),
     defineField({
+      name: "userEmail",
+      title: "Email khách hàng",
+      type: "string",
+      description: "Email của khách hàng (để quản lý dễ hơn)",
+      validation: (Rule) => Rule.required().email().error("Email không hợp lệ"),
+    }),
+    defineField({
+      name: "customerPhone",
+      title: "Số điện thoại khách hàng",
+      type: "string",
+      description: "Số ��iện thoại của khách hàng (để quản lý dễ hơn)",
+      validation: (Rule) => Rule.required().error("Vui lòng nhập số điện thoại khách hàng"),
+    }),
+    defineField({
       name: "fullName",
       title: "Họ và tên người nhận",
       type: "string",
@@ -22,7 +36,7 @@ export const addressType = defineType({
     }),
     defineField({
       name: "phone",
-      title: "Số điện thoại",
+      title: "Số điện thoại (Giao hàng)",
       type: "string",
       validation: (Rule) =>
         Rule.required()
