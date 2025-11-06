@@ -36,6 +36,7 @@ export default function AddressesPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -50,6 +51,7 @@ export default function AddressesPage() {
   const fetchAddresses = async () => {
     if (!user?.id) return;
     try {
+      setPageLoading(true);
       const res = await fetch(`/api/address?userId=${user.id}`, { cache: "no-store" });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Lỗi tải dữ liệu");
@@ -59,11 +61,15 @@ export default function AddressesPage() {
     } catch (err) {
       console.error("Fetch address error:", err);
       toast.error("Không thể tải danh sách địa chỉ!");
+    } finally {
+      setPageLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAddresses();
+    if (user?.id) {
+      fetchAddresses();
+    }
   }, [user?.id]);
 
   // 🔸 Thêm địa chỉ mới
