@@ -80,6 +80,9 @@ export default function AddressesPage() {
     if (!form.fullName || !form.phone || !form.street || !form.city)
       return toast.error("Vui lòng điền đầy đủ thông tin!");
 
+    if (!user?.id || !user?.emailAddresses?.[0]?.emailAddress)
+      return toast.error("Không thể lấy thông tin tài khoản!");
+
     setLoading(true);
     try {
       const res = await fetch("/api/address", {
@@ -87,7 +90,9 @@ export default function AddressesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          userId: user?.id,
+          userId: user.id,
+          userEmail: user.emailAddresses[0].emailAddress,
+          customerPhone: form.phone,
           isDefault: addresses.length === 0,
         }),
       });
@@ -251,7 +256,7 @@ export default function AddressesPage() {
           disabled={loading}
           className="rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:opacity-90"
         >
-          {loading ? "Đang lưu..." : "Lưu địa chỉ"}
+          {loading ? "Đang lưu..." : "Lưu ��ịa chỉ"}
         </Button>
       </div>
     </motion.div>
