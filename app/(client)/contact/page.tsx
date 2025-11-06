@@ -140,7 +140,7 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                     {/* Phần 2: Form Liên hệ (Bên phải PC, Dưới Mobile) */}
                     <div className="lg:col-span-2 p-8 md:p-10 bg-white rounded-xl shadow-xl">
                         <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-3">Gửi Yêu Cầu Tư Vấn</h2>
-                        <form className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 
                                 {/* Tên */}
