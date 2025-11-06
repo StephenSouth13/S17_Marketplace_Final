@@ -145,38 +145,43 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                 
                                 {/* Tên */}
                                 <div>
-                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>
-                                    {/* Thay thế bằng component Input của bạn */}
-                                    <input 
-                                        type="text" 
-                                        id="name" 
-                                        name="name" 
+                                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>
+                                    <input
+                                        type="text"
+                                        id="fullName"
+                                        name="fullName"
+                                        value={formData.fullName}
+                                        onChange={handleChange}
                                         placeholder="Nhập tên của bạn"
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
                                         required
                                     />
                                 </div>
-                                
+
                                 {/* Email */}
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <input 
-                                        type="email" 
-                                        id="email" 
-                                        name="email" 
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
                                         placeholder="Nhập địa chỉ email"
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
                                         required
                                     />
                                 </div>
-                                
+
                                 {/* Số điện thoại */}
                                 <div>
                                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Số Điện Thoại</label>
-                                    <input 
-                                        type="tel" 
-                                        id="phone" 
-                                        name="phone" 
+                                    <input
+                                        type="tel"
+                                        id="phone"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
                                         placeholder="VD: 090xxxxxxx"
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
                                         required
