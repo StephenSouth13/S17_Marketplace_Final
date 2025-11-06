@@ -173,7 +173,7 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                     />
                                 </div>
 
-                                {/* Số ��iện thoại */}
+                                {/* Số điện thoại */}
                                 <div>
                                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Số Điện Thoại</label>
                                     <input
@@ -215,7 +215,8 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                     id="message"
                                     name="message"
                                     rows={5}
-                                    defaultValue={prefillService ? `Tôi quan tâm đến: ${prefillService}\n\n` : ""}
+                                    value={formData.message}
+                                    onChange={handleChange}
                                     placeholder="Xin vui lòng mô tả yêu cầu của bạn..."
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
                                     required
@@ -224,12 +225,12 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
 
                             {/* Nút Gửi */}
                             <div className="flex justify-end">
-                                {/* Thay thế bằng component Button của bạn */}
                                 <button
                                     type="submit"
-                                    className="px-8 py-3 bg-shop_dark_green text-white font-semibold rounded-lg shadow-md hover:bg-shop_dark_green/90 transition-all duration-300 ease-in-out transform hover:scale-[1.01] flex items-center gap-2"
+                                    disabled={loading}
+                                    className="px-8 py-3 bg-shop_dark_green text-white font-semibold rounded-lg shadow-md hover:bg-shop_dark_green/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-[1.01] flex items-center gap-2"
                                 >
-                                    Gửi Yêu Cầu <Mail size={18} />
+                                    {loading ? "Đang gửi..." : "Gửi Yêu Cầu"} <Mail size={18} />
                                 </button>
                             </div>
                         </form>
