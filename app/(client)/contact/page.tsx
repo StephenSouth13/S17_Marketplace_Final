@@ -173,7 +173,7 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                     />
                                 </div>
 
-                                {/* Số điện thoại */}
+                                {/* Số ��iện thoại */}
                                 <div>
                                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Số Điện Thoại</label>
                                     <input
@@ -194,11 +194,12 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                     <select
                                         id="subject"
                                         name="subject"
+                                        value={formData.subject}
+                                        onChange={handleChange}
                                         className="w-full p-3 border border-gray-300 bg-white rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150 appearance-none"
-                                        defaultValue={prefillService || ""}
                                         required
                                     >
-                                        <option value="" disabled>Chọn lĩnh vực</option>
+                                        <option value="">Chọn lĩnh vực</option>
                                         <option value="E-commerce">Giải pháp Thương mại điện tử</option>
                                         <option value="Investment">Tư vấn Đầu tư</option>
                                         <option value="Coaching">Chương trình Coaching/Mentoring</option>
