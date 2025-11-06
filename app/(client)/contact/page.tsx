@@ -153,6 +153,7 @@ const ContactPage = ({ searchParams }: { searchParams: { service?: string } }) =
                                     id="message"
                                     name="message"
                                     rows={5}
+                                    defaultValue={prefillService ? `Tôi quan tâm đến: ${prefillService}\n\n` : ""}
                                     placeholder="Xin vui lòng mô tả yêu cầu của bạn..."
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
                                     required
