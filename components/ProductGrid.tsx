@@ -32,10 +32,11 @@ const ProductGrid = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const query =
-          variantValue === "all"
-            ? `*[_type == "product" && isFeatured == true] | order(_createdAt desc){..., "categories": categories[]->title}`
-            : `*[_type == "product" && variant == $variant && isFeatured == true] | order(_createdAt desc){..., "categories": categories[]->title}`;
+        // Bạn thay đoạn này vào code của mình:
+const query =
+  variantValue === "all"
+    ? `*[_type == "product" && isFeatured == true && !(_id in path('drafts.**'))] | order(_createdAt desc){..., "categories": categories[]->title}`
+    : `*[_type == "product" && variant == $variant && isFeatured == true && !(_id in path('drafts.**'))] | order(_createdAt desc){..., "categories": categories[]->title}`;
 
         const res =
           variantValue === "all"

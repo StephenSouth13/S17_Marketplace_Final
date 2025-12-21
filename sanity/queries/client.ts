@@ -1,3 +1,4 @@
+//D:\Website\S17\S17_Marketplace_Final_\sanity\queries\client.ts
 import { createClient } from 'next-sanity'
 
 export const client = createClient({

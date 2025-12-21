@@ -11,7 +11,7 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: false, // ❌ Bắt buộc tắt CDN để đảm bảo fetch được data private
-  token,         // ✅ Quan trọng: cần token có quyền read
-  perspective: 'published', // ✅ Chỉ lấy nội dung đã publish
+  useCdn: false, // Để false để luôn lấy data mới nhất khi bạn vừa sửa ở Studio
+  token,         
+  perspective: 'published', // ✅ Cực kỳ quan trọng để không lấy nhầm bản Draft chưa sửa
 })
