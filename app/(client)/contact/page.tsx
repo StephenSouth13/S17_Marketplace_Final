@@ -1,3 +1,4 @@
+"use client";
 import Container from "@/components/Container";
 import Title from "@/components/Title";
 import { Mail, Phone, MapPin } from "lucide-react";
