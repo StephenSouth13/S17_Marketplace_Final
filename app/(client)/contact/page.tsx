@@ -1,19 +1,19 @@
 "use client";
-import Container from "@/components/Container";
-import Title from "@/components/Title";
+
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { Mail, Phone, MapPin } from "lucide-react";
 import React from "react";
-// Giả định bạn có component Input và Button
-// import { Input } from "@/components/ui/input";
-// import { Button } from "@/components/ui/button";
+import Container from "@/components/Container";
+import Title from "@/components/Title";
 
-// Dữ liệu liên hệ
+// 1. Khai báo dữ liệu tĩnh (Sắp xếp dưới các lệnh import)
 const CONTACT_INFO = [
     {
         icon: MapPin,
         title: "Địa chỉ văn phòng",
         detail: "180A, Nam Kỳ Khởi Nghĩa, Phường Võ Thị Sáu, Quận 3, TP.HCM",
-        link: "https://maps.app.goo.gl/YourMapLinkHere", // Thay thế bằng link Google Maps thực tế
+        link: "https://maps.app.goo.gl/YourMapLinkHere",
     },
     {
         icon: Phone,
@@ -29,68 +29,63 @@ const CONTACT_INFO = [
     },
 ];
 
-"use client";
-
-import { useState } from "react";
-import toast from "react-hot-toast";
-
 interface ContactPageProps {
-  searchParams?: { service?: string };
+    searchParams?: { service?: string };
 }
 
+// 2. Component chính
 const ContactPage = ({ searchParams }: ContactPageProps) => {
     const prefillService = searchParams?.service ? decodeURIComponent(searchParams.service) : "";
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-      fullName: "",
-      email: "",
-      phone: "",
-      subject: prefillService || "",
-      message: prefillService ? `Tôi quan tâm đến: ${prefillService}\n\n` : "",
+        fullName: "",
+        email: "",
+        phone: "",
+        subject: prefillService || "",
+        message: prefillService ? `Tôi quan tâm đến: ${prefillService}\n\n` : "",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      setLoading(true);
+        e.preventDefault();
+        setLoading(true);
 
-      try {
-        const res = await fetch("/api/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
+        try {
+            const res = await fetch("/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
 
-        const json = await res.json();
+            const json = await res.json();
 
-        if (!res.ok) {
-          throw new Error(json.error || "Gửi yêu cầu thất bại");
+            if (!res.ok) {
+                throw new Error(json.error || "Gửi yêu cầu thất bại");
+            }
+
+            toast.success(json.message);
+            setFormData({
+                fullName: "",
+                email: "",
+                phone: "",
+                subject: "",
+                message: "",
+            });
+        } catch (err) {
+            console.error("Contact form error:", err);
+            toast.error(err instanceof Error ? err.message : "Có lỗi xảy ra");
+        } finally {
+            setLoading(false);
         }
-
-        toast.success(json.message);
-        setFormData({
-          fullName: "",
-          email: "",
-          phone: "",
-          subject: "",
-          message: "",
-        });
-      } catch (err) {
-        console.error("Contact form error:", err);
-        toast.error(err instanceof Error ? err.message : "Có lỗi xảy ra");
-      } finally {
-        setLoading(false);
-      }
     };
 
     return (
         <div className="py-12 md:py-20 bg-gray-50">
             <Container className="max-w-6xl">
-                
                 <div className="text-center mb-12">
                     <Title className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-3">
                         Kết Nối Với Chúng Tôi
@@ -101,7 +96,7 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Phần 1: Thông tin liên hệ (Bên trái PC, Trên Mobile) */}
+                    {/* Thông tin liên hệ */}
                     <div className="lg:col-span-1 space-y-8 p-6 bg-white rounded-xl shadow-lg h-fit">
                         {CONTACT_INFO.map((item, index) => (
                             <div key={index} className="flex items-start gap-4">
@@ -110,9 +105,9 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-bold text-gray-900">{item.title}</h3>
-                                    <a 
-                                        href={item.link} 
-                                        target="_blank" 
+                                    <a
+                                        href={item.link}
+                                        target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-base text-gray-600 hover:text-shop_dark_green transition-colors"
                                     >
@@ -121,12 +116,11 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                 </div>
                             </div>
                         ))}
-                        
-                        {/* Bổ sung Map Iframe cho hiển thị đẹp hơn trên PC */}
+
                         <div className="mt-8">
                             <h3 className="text-lg font-bold text-gray-900 mb-2">Vị trí trên bản đồ</h3>
                             <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.227494490333!2d106.689363574972!3d10.79374098934526!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f2061214e9f%3A0xc6c7d7e792f44c4b!2zMTgwQSBQLiBOYW0gSyzigkGvIEvpg40gTmdoxKlhLCBQLsOgW8oQxIBpIFNlw7IsIFF14bqtbiAzLCBUUC5I4buTIEPDrSBNaW5o!5e0!3m2!1sen!2s!4v1699949495123!5m2!1sen!2s"
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.424364446487!2d106.68764037583856!3d10.778772359146142!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f306915174f%3A0xc3f835e5d16788a8!2zMTgwQSBOYW0gS-G7syBLaOG7n2kgTmdoxKlhLCBWw7UgVGjhu4sgU8OhdSwgUXXhuq1uIDMsIEjhu5MgQ2jDrSBNaW5oLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1710000000000!5m2!1svi!2s"
                                 width="100%"
                                 height="250"
                                 style={{ border: 0 }}
@@ -138,13 +132,11 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                         </div>
                     </div>
 
-                    {/* Phần 2: Form Liên hệ (Bên phải PC, Dưới Mobile) */}
+                    {/* Form Liên hệ */}
                     <div className="lg:col-span-2 p-8 md:p-10 bg-white rounded-xl shadow-xl">
                         <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-3">Gửi Yêu Cầu Tư Vấn</h2>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                
-                                {/* Tên */}
                                 <div>
                                     <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>
                                     <input
@@ -154,12 +146,10 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                         value={formData.fullName}
                                         onChange={handleChange}
                                         placeholder="Nhập tên của bạn"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green outline-none transition duration-150"
                                         required
                                     />
                                 </div>
-
-                                {/* Email */}
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                                     <input
@@ -169,12 +159,10 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                         value={formData.email}
                                         onChange={handleChange}
                                         placeholder="Nhập địa chỉ email"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green outline-none transition duration-150"
                                         required
                                     />
                                 </div>
-
-                                {/* Số điện thoại */}
                                 <div>
                                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Số Điện Thoại</label>
                                     <input
@@ -184,12 +172,10 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                         value={formData.phone}
                                         onChange={handleChange}
                                         placeholder="VD: 090xxxxxxx"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green outline-none transition duration-150"
                                         required
                                     />
                                 </div>
-                                
-                                {/* Lĩnh vực quan tâm */}
                                 <div>
                                     <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">Lĩnh vực quan tâm</label>
                                     <select
@@ -197,7 +183,7 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                         name="subject"
                                         value={formData.subject}
                                         onChange={handleChange}
-                                        className="w-full p-3 border border-gray-300 bg-white rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150 appearance-none"
+                                        className="w-full p-3 border border-gray-300 bg-white rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green outline-none transition duration-150 appearance-none"
                                         required
                                     >
                                         <option value="">Chọn lĩnh vực</option>
@@ -205,11 +191,9 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                         <option value="Investment">Tư vấn Đầu tư</option>
                                         <option value="Coaching">Chương trình Coaching/Mentoring</option>
                                         <option value="Other">Khác</option>
-                                    </select>
+                                      </select>
                                 </div>
                             </div>
-                            
-                            {/* Nội dung tin nhắn */}
                             <div>
                                 <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Nội Dung Chi Tiết</label>
                                 <textarea
@@ -219,12 +203,10 @@ const ContactPage = ({ searchParams }: ContactPageProps) => {
                                     value={formData.message}
                                     onChange={handleChange}
                                     placeholder="Xin vui lòng mô tả yêu cầu của bạn..."
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green transition duration-150"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-shop_dark_green focus:border-shop_dark_green outline-none transition duration-150"
                                     required
                                 ></textarea>
                             </div>
-
-                            {/* Nút Gửi */}
                             <div className="flex justify-end">
                                 <button
                                     type="submit"
