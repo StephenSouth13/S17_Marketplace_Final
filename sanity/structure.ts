@@ -1,18 +1,18 @@
 import type {StructureResolver} from 'sanity/structure'
 
-// https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
     .items([
-      // Contact Submissions Management
+      // 1. Quản lý Yêu Cầu Liên Hệ (Dựa trên name: "contactSubmission")
       S.documentTypeListItem('contactSubmission').title('📧 Yêu Cầu Liên Hệ'),
 
-      // Contact Person Management
-      S.documentTypeListItem('contactPerson').title('👥 Người Liên Hệ'),
+      S.divider(), // Vạch ngăn cách
 
-      // Rest of document types
+      // 2. Tự động hiển thị các loại tài liệu còn lại trừ contactSubmission
       ...S.documentTypeListItems().filter(
-        (item: any) => item.getId && item.getId() !== 'contactSubmission' && item.getId() !== 'contactPerson'
+        (item: any) => 
+          item.getId && 
+          item.getId() !== 'contactSubmission'
       ),
     ])

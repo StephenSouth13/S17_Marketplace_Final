@@ -2,7 +2,7 @@ import { EnvelopeIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
 export const contactSubmissionType = defineType({
-  name: "contactSubmission",
+  name: "contactSubmission", // ID định danh chính xác
   title: "Yêu Cầu Liên Hệ",
   type: "document",
   icon: EnvelopeIcon,
@@ -90,7 +90,7 @@ export const contactSubmissionType = defineType({
 
       return {
         title: `${statusEmoji[status as string] || "📧"} ${title}`,
-        subtitle: `${subtitle} • ${new Date(date).toLocaleDateString("vi-VN")}`,
+        subtitle: `${subtitle} • ${date ? new Date(date).toLocaleDateString("vi-VN") : 'N/A'}`,
       };
     },
   },
