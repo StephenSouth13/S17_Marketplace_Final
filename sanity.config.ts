@@ -1,59 +1,95 @@
-import { visionTool } from '@sanity/vision';
-import { defineConfig } from 'sanity';
-import { structureTool } from 'sanity/structure';
-import { apiVersion, dataset, projectId } from './sanity/env';
-import { structure } from './sanity/structure'; 
+import { EnvelopeIcon } from "@sanity/icons";
+import { defineField, defineType } from "sanity";
 
-// === IMPORT SCHEMAS ===
-import { blockContentType as blockContent } from './sanity/schemaTypes/blockContentType';
-import { categoryType as category } from './sanity/schemaTypes/categoryType';
-import { productType as product } from './sanity/schemaTypes/productType';
-import { authorType as author } from './sanity/schemaTypes/authorType';
-import { brandType as brand } from './sanity/schemaTypes/brandType';
-import { blogType as blog } from './sanity/schemaTypes/blogType';
-import { blogCategoryType as blogcategory } from './sanity/schemaTypes/blogCategoryType';
-import { orderType as order } from './sanity/schemaTypes/orderType';
-import { addressType as address } from './sanity/schemaTypes/addressType'; 
-import plan from './sanity/schemaTypes/planType'; 
-import { serviceCategoryType as serviceCategory } from './sanity/schemaTypes/serviceCategory'; 
-import { serviceType as service } from './sanity/schemaTypes/serviceType';
-
-// Import Contact Submission
-import { contactSubmissionType as contactSubmission } from './sanity/schemaTypes/contactSubmissionType'; 
-
-export default defineConfig({
-  basePath: '/studio',
-  name: 'default',
-  title: 'S17 Marketplace',
-  projectId,
-  dataset,
-
-  schema: {
-    types: [
-      // Documents chính
-      category,
-      product,
-      author,
-      brand,
-      blog,
-      blogcategory,
-      order,
-      address,
-      
-      // Documents Dịch vụ
-      serviceCategory,
-      service,
-
-      // Đăng ký Contact Submission (Fix lỗi "not found")
-      contactSubmission, 
-
-      // Objects/Custom Types
-      blockContent, 
-      plan, 
-    ],
-  },
-  plugins: [
-    structureTool({ structure }),
-    visionTool({ defaultApiVersion: apiVersion }),
+export const contactSubmissionType = defineType({
+  name: "contactSubmission", 
+  title: "Yêu Cầu Liên Hệ",
+  type: "document",
+  icon: EnvelopeIcon,
+  fields: [
+    defineField({
+      name: "fullName",
+      title: "Họ và Tên Khách Hàng",
+      type: "string",
+      validation: (Rule) => Rule.required().min(2),
+    }),
+    defineField({
+      name: "email",
+      title: "Email",
+      type: "string",
+      validation: (Rule) => Rule.required().email(),
+    }),
+    defineField({
+      name: "phone",
+      title: "Số Điện Thoại",
+      type: "string",
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "subject",
+      title: "Lĩnh Vực Quan Tâm",
+      type: "string",
+      options: {
+        list: [
+          { title: "Giải pháp Thương mại điện tử", value: "E-commerce" },
+          { title: "Tư vấn Đầu tư", value: "Investment" },
+          { title: "Chương trình Coaching/Mentoring", value: "Coaching" },
+          { title: "Dịch vụ Khác", value: "Other" },
+        ],
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "message",
+      title: "Nội Dung Yêu Cầu",
+      type: "text",
+      validation: (Rule) => Rule.required().min(10),
+    }),
+    defineField({
+      name: "submittedAt",
+      title: "Thời Gian Gửi",
+      type: "datetime",
+      initialValue: () => new Date().toISOString(),
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "status",
+      title: "Trạng Thái",
+      type: "string",
+      options: {
+        list: [
+          { title: "Chưa Xử Lý", value: "new" },
+          { title: "Đang Xử Lý", value: "processing" },
+          { title: "Đã Phản Hồi", value: "replied" },
+          { title: "Đã Giải Quyết", value: "resolved" },
+        ],
+      },
+      initialValue: "new",
+    }),
+    defineField({
+      name: "notes",
+      title: "Ghi Chú Nội Bộ",
+      type: "text",
+    }),
   ],
+  preview: {
+    select: {
+      title: "fullName",
+      subtitle: "email",
+      status: "status",
+      date: "submittedAt",
+    },
+    prepare({ title, subtitle, status, date }) {
+      const statusEmoji: Record<string, string> = {
+        new: "🆕",
+        processing: "⏳",
+        replied: "✅",
+        resolved: "✔️",
+      };
+      return {
+        title: `${statusEmoji[status as string] || "📧"} ${title}`,
+        subtitle: `${subtitle} • ${date ? new Date(date).toLocaleDateString("vi-VN") : 'N/A'}`,
+      };
+    },
+  },
 });
