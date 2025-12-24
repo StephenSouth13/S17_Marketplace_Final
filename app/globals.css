@@ -4,7 +4,7 @@
 
 /* ---------------- Custom Theme Variables ---------------- */
 :root {
-  --font-poppins: "Montserrat", sans-serif;
+ --font-montserrat: "Montserrat", sans-serif;
 
   /* Colors */
   --color-shop_light_pink: #fcf0e4;
@@ -42,7 +42,7 @@
 
   body {
     @apply bg-[var(--background)] text-[var(--foreground)];
-    font-family: var(--font-poppins);
+    font-family: var(--font-montserrat);
   }
 
   button {
