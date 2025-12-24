@@ -45,40 +45,39 @@ export const serviceType = defineType({
     }),
 
     // CÁC GÓI DỊCH VỤ (CHỈ HIỂN THỊ KHI CHỌN TIERED)
-    defineField({
-        name: 'plans',
-        title: 'Các Gói Dịch vụ (Basic/Pro/Premium)',
-        type: 'array',
-        // Sửa đoạn 'of' này để định nghĩa cấu trúc của plan
-        of: [
-          {
-            type: 'object',
-            name: 'plan',
-            title: 'Gói dịch vụ',
-            fields: [
-              { name: 'name', title: 'Tên gói', type: 'string' },
-              { name: 'price', title: 'Giá hiển thị', type: 'string' },
-              { 
-                name: 'features', 
-                title: 'Tính năng', 
-                type: 'array', 
-                of: [{ type: 'string' }] 
-              },
-              { name: 'isPopular', title: 'Gói phổ biến nhất?', type: 'boolean' },
-            ]
-          }
-        ], 
-        description: 'Chỉ điền nếu "Mô hình Giá" là Theo Gói.',
-        hidden: ({ parent }) => parent?.pricingModel !== 'tiered',
-        validation: (Rule) => Rule.custom((plans, context) => {
-            const pricingModel = (context.parent as any)?.pricingModel;
-            if (pricingModel === 'tiered' && (!plans || plans.length === 0)) {
-                return 'Phải có ít nhất một Gói Dịch vụ khi chọn mô hình Theo Gói.';
-            }
-            return true;
-        }),
-    }),
-    
+defineField({
+  name: 'plans',
+  title: 'Các Gói Dịch vụ (Basic/Pro/Premium)',
+  type: 'array',
+  // Sửa đoạn 'of' bên dưới:
+  of: [
+    {
+      type: 'object',
+      name: 'plan',
+      title: 'Gói dịch vụ',
+      fields: [
+        { name: 'name', title: 'Tên gói', type: 'string' },
+        { name: 'price', title: 'Giá', type: 'string' },
+        { 
+          name: 'features', 
+          title: 'Tính năng', 
+          type: 'array', 
+          of: [{ type: 'string' }] 
+        },
+        { name: 'isPopular', title: 'Gói phổ biến nhất?', type: 'boolean', initialValue: false },
+      ]
+    }
+  ],
+  description: 'Chỉ điền nếu "Mô hình Giá" là Theo Gói.',
+  hidden: ({ parent }) => parent?.pricingModel !== 'tiered',
+  validation: (Rule) => Rule.custom((plans, context) => {
+    const pricingModel = (context.parent as any)?.pricingModel;
+    if (pricingModel === 'tiered' && (!plans || (plans as any[]).length === 0)) {
+      return 'Phải có ít nhất một Gói Dịch vụ khi chọn mô hình Theo Gói.';
+    }
+    return true;
+  }),
+}),
     // Gắn nhãn nổi bật: GIỮ NGUYÊN
     defineField({
       name: "isFeatured",

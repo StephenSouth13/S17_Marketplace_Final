@@ -15,7 +15,7 @@ interface Blog {
   title: string;
   slug: { current: string };
   publishedAt: string;
-  mainImage?: any;
+  mainImage?: unknown;
   blogcategories?: { title: string }[];
 }
 
