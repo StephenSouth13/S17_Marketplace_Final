@@ -1,3 +1,5 @@
+import { sanityFetch } from "../lib/live";
+
 // ==========================
 // 🧩 PRODUCT & BRAND QUERIES
 // ==========================
@@ -103,8 +105,6 @@ const MY_ORDERS_QUERY = `
 // ==========================
 // 🧩 SERVICES QUERIES
 // ==========================
-
-// ✅ Dịch vụ nổi bật (hiển thị ở trang chủ)
 const SERVICES_QUERY = `
   *[_type == "service" && isFeatured == true] | order(publishedAt desc){
     _id,
@@ -127,7 +127,6 @@ const SERVICES_QUERY = `
   }
 `;
 
-// ✅ Lấy chi tiết 1 dịch vụ theo slug
 const SERVICE_BY_SLUG_QUERY = `
   *[_type == "service" && slug.current == $slug][0]{
     _id,
@@ -149,7 +148,6 @@ const SERVICE_BY_SLUG_QUERY = `
   }
 `;
 
-// ✅ Danh mục dịch vụ
 const SERVICE_CATEGORIES = `
   *[_type == "serviceCategory"] | order(title asc){
     ...,
@@ -158,9 +156,64 @@ const SERVICE_CATEGORIES = `
 `;
 
 // ==========================
-// ✅ EXPORT
+// 🧩 SELLER QUERIES (XỊN XÒ)
+// ==========================
+
+// 1. Dữ liệu cấu hình chung của trang Seller
+const SELLER_PAGE_QUERY = `*[_type == "sellerPage"][0]{
+    title,
+    heroImage,
+    description,
+    benefits[]{
+      icon,
+      label,
+      detail
+    },
+    "marketingKit": marketingKit[]{
+      description,
+      "url": asset->url,
+      "originalName": asset->originalFilename
+    }
+  }`;
+
+// 2. Dữ liệu danh sách con người thật (Hình ảnh, tên tuổi...)
+const ALL_SELLERS_QUERY = `*[_type == "seller"] | order(order asc, _createdAt desc){
+    _id,
+    name,
+    role,
+    avatar,
+    bio,
+    isVerified
+  }`;
+
+// ==========================
+// 🛠️ HELPER FUNCTIONS (Hàm lấy dữ liệu)
+// ==========================
+
+const getSellerPageData = async () => {
+  return await sanityFetch({ 
+    query: SELLER_PAGE_QUERY 
+  });
+};
+
+const getAllSellers = async () => {
+  return await sanityFetch({ 
+    query: ALL_SELLERS_QUERY 
+  });
+};
+
+const getMyOrders = async (userId: string) => {
+  return await sanityFetch({
+    query: MY_ORDERS_QUERY,
+    params: { userId },
+  });
+};
+
+// ==========================
+// ✅ EXPORT DANH SÁCH (CHỈ MỘT LẦN DUY NHẤT)
 // ==========================
 export {
+  // Constants
   BRANDS_QUERY,
   DEAL_PRODUCTS,
   PRODUCT_BY_SLUG_QUERY,
@@ -174,4 +227,11 @@ export {
   SERVICES_QUERY,
   SERVICE_BY_SLUG_QUERY,
   SERVICE_CATEGORIES,
+  SELLER_PAGE_QUERY,
+  ALL_SELLERS_QUERY,
+  
+  // Functions
+  getSellerPageData,
+  getAllSellers,
+  getMyOrders,
 };

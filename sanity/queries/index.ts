@@ -1,3 +1,4 @@
+//D:\Website\S17\S17_Marketplace_Final_\sanity\queries\index.ts
 import { sanityFetch } from "../lib/live";
 // Giả định bạn có định nghĩa kiểu Category ở đâu đó, ví dụ trong "@/sanity.types"
 // Tuy nhiên, để tránh lỗi nếu Category chưa được import, tôi sẽ loại bỏ nó khỏi import và dùng kiểu 'any' khi cần thiết.
@@ -42,7 +43,7 @@ const getCategories = async (quantity?: number) => {
     });
     
     // Đảm bảo data không phải là null
-    return (data ?? []) as any[]; // Ép kiểu về mảng nếu cần thiết
+    return (data ?? []) as unknown[]; // Ép kiểu về mảng nếu cần thiết
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];

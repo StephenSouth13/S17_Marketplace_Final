@@ -49,7 +49,25 @@ export const serviceType = defineType({
         name: 'plans',
         title: 'Các Gói Dịch vụ (Basic/Pro/Premium)',
         type: 'array',
-        of: [{ type: 'plan' }], // <-- Đã được thiết lập đúng để sử dụng schema 'plan'
+        // Sửa đoạn 'of' này để định nghĩa cấu trúc của plan
+        of: [
+          {
+            type: 'object',
+            name: 'plan',
+            title: 'Gói dịch vụ',
+            fields: [
+              { name: 'name', title: 'Tên gói', type: 'string' },
+              { name: 'price', title: 'Giá hiển thị', type: 'string' },
+              { 
+                name: 'features', 
+                title: 'Tính năng', 
+                type: 'array', 
+                of: [{ type: 'string' }] 
+              },
+              { name: 'isPopular', title: 'Gói phổ biến nhất?', type: 'boolean' },
+            ]
+          }
+        ], 
         description: 'Chỉ điền nếu "Mô hình Giá" là Theo Gói.',
         hidden: ({ parent }) => parent?.pricingModel !== 'tiered',
         validation: (Rule) => Rule.custom((plans, context) => {

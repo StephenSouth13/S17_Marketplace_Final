@@ -1,7 +1,8 @@
-// Nhập các tiện ích và thành phần cần thiết
+// D:\Website\S17\S17_Marketplace_Final_\app\(client)\blog\[slug]\page.tsx
 import Container from "@/components/Container";
 import Title from "@/components/Title";
 // Import các kiểu dữ liệu từ Sanity.types
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { SINGLE_BLOG_QUERYResult, OTHERS_BLOG_QUERYResult, BLOG_CATEGORIESResult, Slug } from "@/sanity.types"; 
 import { urlFor } from "@/sanity/lib/image";
 import {

@@ -1,3 +1,4 @@
+//D:\Website\S17\S17_Marketplace_Final_\app\studio\[[...tool]]\page.tsx
 "use client";
 
 import dynamic from "next/dynamic";

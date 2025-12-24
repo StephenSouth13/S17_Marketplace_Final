@@ -1,11 +1,12 @@
-import { PhoneIcon } from "@sanity/icons";
+import { MobileDeviceIcon } from "@sanity/icons"; 
 import { defineField, defineType } from "sanity";
 
 export const contactPersonType = defineType({
   name: "contactPerson",
   title: "Người Liên Hệ",
   type: "document",
-  icon: PhoneIcon,
+  // 2. Sửa dòng này
+  icon: MobileDeviceIcon,
   fields: [
     defineField({
       name: "fullName",

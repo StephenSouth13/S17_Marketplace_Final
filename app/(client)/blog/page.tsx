@@ -1,4 +1,4 @@
-// Nhập các tiện ích và thành phần cần thiết
+// D:\Website\S17\S17_Marketplace_Final_\app\(client)\blog\page.tsx
 import Container from "@/components/Container";
 import Title from "@/components/Title";
 import { urlFor } from "@/sanity/lib/image";
